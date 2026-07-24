@@ -38,9 +38,13 @@
       ]
     },
     {
-      "label": "Run hello_bridge",
+      "label": "Run betaflight_gazebo_bridge",
       "type": "shell",
-      "command": "${workspaceFolder}/build/debug/hello_bridge",
+      "command": "${workspaceFolder}/build/debug/betaflight_gazebo_bridge",
+      "args": [
+        "--config",
+        "${workspaceFolder}/config/bridge.yaml"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -51,4 +55,3 @@
     }
   ]
 }
-

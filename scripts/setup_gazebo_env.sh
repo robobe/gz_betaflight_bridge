@@ -21,10 +21,10 @@ append_env_path() {
 
 append_env_path GZ_SIM_RESOURCE_PATH "${PROJECT_ROOT}"
 append_env_path GZ_SIM_RESOURCE_PATH "${PROJECT_ROOT}/worlds"
+append_env_path GZ_SIM_RESOURCE_PATH "${PROJECT_ROOT}/models"
 
 append_env_path GZ_SIM_SYSTEM_PLUGIN_PATH "${PROJECT_ROOT}/build/debug"
 append_env_path GZ_SIM_SYSTEM_PLUGIN_PATH "${PROJECT_ROOT}/build/release"
 
 echo "GZ_SIM_RESOURCE_PATH=${GZ_SIM_RESOURCE_PATH}"
 echo "GZ_SIM_SYSTEM_PLUGIN_PATH=${GZ_SIM_SYSTEM_PLUGIN_PATH}"
-

@@ -2,11 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug hello_bridge",
+      "name": "Debug betaflight_gazebo_bridge",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/debug/hello_bridge",
-      "args": [],
+      "program": "${workspaceFolder}/build/debug/betaflight_gazebo_bridge",
+      "args": [
+        "--config",
+        "${workspaceFolder}/config/bridge.yaml"
+      ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
@@ -24,4 +27,3 @@
     }
   ]
 }
-

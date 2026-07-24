@@ -1,0 +1,28 @@
+sitl:
+  address: 127.0.0.1
+  motor_port: 9002
+  fdm_port: 9003
+  rc_port: 9004
+
+gazebo:
+  imu_topic: /imu
+  altimeter_topic: /altimeter
+  actuator_topic: /X3/gazebo/command/motor_speed
+
+fdm:
+  rate_hz: 500
+  pressure_mode: from_altitude
+  sea_level_pressure_pa: 101325.0
+
+motors:
+  input: normalized_9002
+  map: [0, 1, 2, 3]
+  min_rotor_velocity_rad_s: 0.0
+  max_rotor_velocity_rad_s: 800.0
+  timeout_seconds: 0.10
+  publish_zero_on_timeout: true
+
+logging:
+  level: info
+  status_period_seconds: 1.0
+  log_first_packets: true

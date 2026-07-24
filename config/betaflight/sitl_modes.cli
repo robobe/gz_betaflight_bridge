@@ -1,0 +1,24 @@
+# Betaflight SITL mode setup for bridge smoke tests.
+#
+# CLI format:
+# aux <slot> <mode_id> <aux_index> <start_us> <end_us> <logic> <linked_mode>
+#
+# mode_id:
+#   0 = ARM
+#   1 = ANGLE
+#
+# aux_index is zero-based:
+#   0 = AUX1 / RC channel 5
+#   1 = AUX2 / RC channel 6
+#
+# logic:
+#   0 = OR
+
+# AUX1 high arms.
+aux 0 0 0 1700 2100 0 0
+
+# AUX2 high enables ANGLE mode.
+aux 1 1 1 1700 2100 0 0
+
+save
+

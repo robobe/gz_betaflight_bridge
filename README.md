@@ -1,6 +1,6 @@
 # gz_betaflight_bridge
 
-This repository is being bootstrapped toward a Betaflight SITL to Gazebo Sim bridge. The current first step is a small C++ CMake project that builds and debugs a hello-world executable. Gazebo-specific plugin code will come after the build/debug workflow is working.
+This repository contains a standalone C++ bridge between Betaflight SITL and Gazebo Sim Harmonic. The bridge subscribes to Gazebo IMU and altimeter topics, sends Betaflight FDM packets to SITL, receives Betaflight motor commands, converts them to rotor velocity, and publishes `gz.msgs.Actuators` for Gazebo's multicopter motor model.
 
 ## Current layout
 
@@ -8,11 +8,20 @@ This repository is being bootstrapped toward a Betaflight SITL to Gazebo Sim bri
 .
 ├── CMakeLists.txt
 ├── CMakePresets.json
+├── config/
+│   └── bridge.yaml
+├── include/
 ├── README.md
 ├── docs/
 │   └── betaflight_gazebo_bridge_plan.md
+├── models/
+│   └── betaflight_x3/
+├── scripts/
 ├── src/
 │   └── main.cpp
+├── test/
+├── worlds/
+│   └── quadcopter.sdf
 └── .vscode/
     ├── extensions.json
     ├── launch.json
@@ -26,6 +35,8 @@ This repository is being bootstrapped toward a Betaflight SITL to Gazebo Sim bri
 - Ninja.
 - A C++20 compiler, such as GCC 13.
 - GDB for debugging in VS Code.
+- Gazebo Sim Harmonic development packages.
+- `yaml-cpp` and `spdlog`.
 - VS Code extensions:
   - C/C++ by Microsoft.
   - CMake Tools by Microsoft.
@@ -34,7 +45,7 @@ On Ubuntu, install the command-line tools with:
 
 ```bash
 sudo apt update
-sudo apt install build-essential cmake ninja-build gdb
+sudo apt install build-essential cmake ninja-build gdb libyaml-cpp-dev libspdlog-dev
 ```
 
 ## Configure from the terminal
@@ -91,7 +102,7 @@ Example shape:
 [
   {
     "directory": "/home/user/projects/gz_betaflight_bridge/build/debug",
-    "command": "/usr/bin/c++ -std=gnu++20 -Wall -Wextra -Wpedantic -Werror -o CMakeFiles/hello_bridge.dir/src/main.cpp.o -c /home/user/projects/gz_betaflight_bridge/src/main.cpp",
+    "command": "/usr/bin/c++ -std=gnu++20 -Wall -Wextra -Wpedantic -Werror -I/home/user/projects/gz_betaflight_bridge/include -o CMakeFiles/bridge_core.dir/src/BridgeApp.cc.o -c /home/user/projects/gz_betaflight_bridge/src/BridgeApp.cc",
     "file": "/home/user/projects/gz_betaflight_bridge/src/main.cpp"
   }
 ]
@@ -238,7 +249,7 @@ cmake --build --preset debug
 The debug configuration in `.vscode/launch.json` uses the debug preset output:
 
 ```json
-"program": "${workspaceFolder}/build/debug/hello_bridge",
+"program": "${workspaceFolder}/build/debug/betaflight_gazebo_bridge",
 "preLaunchTask": "CMake: build debug"
 ```
 
@@ -246,7 +257,7 @@ Meaning:
 
 - VS Code debugs the executable produced by the `debug` preset.
 - Before debugging, VS Code runs the debug build task.
-- Pressing `F5` rebuilds and then launches GDB on `build/debug/hello_bridge`.
+- Pressing `F5` rebuilds and then launches GDB on `build/debug/betaflight_gazebo_bridge`.
 
 If VS Code asks which configure preset to use, select:
 
@@ -267,19 +278,19 @@ cmake --build --preset debug
 The output executable is:
 
 ```text
-build/debug/hello_bridge
+build/debug/betaflight_gazebo_bridge
 ```
 
 Run it with:
 
 ```bash
-./build/debug/hello_bridge
+./build/debug/betaflight_gazebo_bridge --config config/bridge.yaml
 ```
 
-Expected output:
+Or use:
 
-```text
-Hello from gz_betaflight_bridge bootstrap.
+```bash
+scripts/run_bridge.sh
 ```
 
 ## Release build
@@ -294,7 +305,7 @@ cmake --build --preset release
 The release executable is:
 
 ```text
-build/release/hello_bridge
+build/release/betaflight_gazebo_bridge
 ```
 
 ## Run the Gazebo quadcopter world
@@ -311,7 +322,7 @@ It was fetched from:
 https://github.com/gazebosim/gz-sim/blob/master/examples/worlds/quadcopter.sdf
 ```
 
-The world includes the X3 UAV model from Gazebo Fuel and four `gz-sim-multicopter-motor-model-system` plugins. It is useful as the starting world for the future Betaflight bridge plugin.
+The world includes the X3 UAV model from Gazebo Fuel and four `gz-sim-multicopter-motor-model-system` plugins. It also loads `gz-sim-physics-system`; without the physics system, Gazebo can receive motor commands but the vehicle will not move.
 
 Before running Gazebo, source the workspace Gazebo environment:
 
@@ -358,6 +369,201 @@ Stop the motors with:
 gz topic -t /X3/gazebo/command/motor_speed --msgtype gz.msgs.Actuators -p 'velocity:[0, 0, 0, 0]'
 ```
 
+## Run Betaflight SITL
+
+The project includes a Betaflight SITL executable at:
+
+```text
+bin/betaflight_SITL.elf
+```
+
+It was built from the official Betaflight source using:
+
+```bash
+make TARGET=SITL
+```
+
+The wrapper script is:
+
+```text
+scripts/run_betaflight_sitl.sh
+```
+
+Show the available SITL options with:
+
+```bash
+scripts/run_betaflight_sitl.sh --help
+```
+
+Current options:
+
+```text
+--ip <address>     Simulator IP address (default: 127.0.0.1)
+--config <file>    Load CLI config file, save to EEPROM, and exit
+--gpx              Write GPS track to sitl_track.gpx
+--help, -h         Show help
+```
+
+Run SITL with the default simulator IP:
+
+```bash
+scripts/run_betaflight_sitl.sh
+```
+
+Run SITL against a specific simulator address:
+
+```bash
+scripts/run_betaflight_sitl.sh --ip 127.0.0.1
+```
+
+Betaflight SITL is a long-running process. Stop it with `Ctrl+C`.
+
+To configure SITL EEPROM for AUX1 arming and AUX2 ANGLE mode, see:
+
+```text
+docs/betaflight_sitl_eeprom.md
+```
+
+The CLI file is:
+
+```text
+config/betaflight/sitl_modes.cli
+```
+
+### See motor traffic on UDP 9002
+
+Betaflight SITL does not send useful motor packets just because the process is running.
+
+The SITL UDP flow is:
+
+```text
+Simulator or bridge -> UDP 9003 -> Betaflight SITL
+Betaflight SITL -> UDP 9002 -> Simulator or bridge
+RC input -> UDP 9004 -> Betaflight SITL
+```
+
+Port `9002` is an output port from Betaflight. Betaflight sends a `servo_packet` there after it receives an `fdm_packet` on port `9003`.
+
+The motor packet format is:
+
+```cpp
+struct servo_packet {
+    float motor_speed[4];
+};
+```
+
+That is 16 bytes total: four little-endian `float` values.
+
+The FDM packet format is:
+
+```cpp
+struct fdm_packet {
+    double timestamp;
+    double imu_angular_velocity_rpy[3];
+    double imu_linear_acceleration_xyz[3];
+    double imu_orientation_quat[4];
+    double velocity_xyz[3];
+    double position_xyz[3];
+    double pressure;
+};
+```
+
+That is 144 bytes total: eighteen little-endian `double` values.
+
+To test this without the Gazebo bridge, open three terminals.
+
+Terminal 1, start SITL:
+
+```bash
+scripts/run_betaflight_sitl.sh
+```
+
+Terminal 2, listen for motor packets:
+
+```bash
+scripts/receive_motors.py
+```
+
+Terminal 3, send fake FDM packets:
+
+```bash
+scripts/send_test_fdm.py
+```
+
+When SITL receives the first FDM packet, it should print something like:
+
+```text
+[SITL] new fdm 144 t:...
+```
+
+The motor receiver should then print packets from `127.0.0.1`.
+
+At this stage the values may be zero or idle-level because the flight controller is not armed and no RC input is being sent. Seeing packets on `9002` only proves the SITL FDM-to-motor-output loop is alive. To see throttle-dependent motor values later, the bridge must provide FDM continuously and RC/MSP configuration must arm the vehicle and command throttle.
+
+## Full-stack takeoff test
+
+First generate the SITL EEPROM once so AUX1 maps to ARM and AUX2 maps to ANGLE:
+
+```bash
+scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+```
+
+The easiest way to start the whole stack is:
+
+```bash
+scripts/run_takeoff_stack.sh
+```
+
+This starts Gazebo, Betaflight SITL, the bridge, and `send_rc_test.py --takeoff-sequence` in the correct order. It writes logs under:
+
+```text
+logs/takeoff-stack-YYYYMMDD-HHMMSS/
+```
+
+Stop everything with `Ctrl+C` in the launcher terminal.
+
+Useful options:
+
+```bash
+scripts/run_takeoff_stack.sh --headless
+scripts/run_takeoff_stack.sh --ramp-end 1600 --hold-duration 20
+scripts/run_takeoff_stack.sh --no-rc
+```
+
+Manual flow, if you want separate terminals:
+
+```bash
+scripts/run_quadcopter_world.sh
+```
+
+```bash
+scripts/run_betaflight_sitl.sh
+```
+
+```bash
+scripts/run_bridge.sh
+```
+
+After the bridge logs `imu=true` and `altimeter=true`, send the RC sequence:
+
+```bash
+scripts/send_rc_test.py --takeoff-sequence
+```
+
+The sequence sends low-throttle disarmed RC first, then arms at low throttle, then ramps throttle to `2000`. This avoids Betaflight's `NOT_DISARMED` blocker and is strong enough to lift the X3 model through the bridge's default `800 rad/s` motor ceiling.
+
+For a gentler test:
+
+```bash
+scripts/send_rc_test.py --takeoff-sequence --ramp-end 1600
+```
+
+More details are in:
+
+```text
+docs/takeoff_test.md
+```
+
 ## Configure and build in VS Code
 
 Open this folder in VS Code:
@@ -388,27 +594,27 @@ cmake --build --preset debug
 The debug configuration is `.vscode/launch.json` entry:
 
 ```text
-Debug hello_bridge
+Debug betaflight_gazebo_bridge
 ```
 
 To debug:
 
-1. Open `src/main.cpp`.
-2. Set a breakpoint on the `std::cout` line.
+1. Open `src/BridgeApp.cc` or another bridge source file.
+2. Set a breakpoint in the code path you want to inspect.
 3. Open the Run and Debug panel.
-4. Select `Debug hello_bridge`.
+4. Select `Debug betaflight_gazebo_bridge`.
 5. Press `F5`.
 
 Before launching GDB, VS Code runs the `CMake: build debug` task. That means code changes are rebuilt automatically before each debug session.
 
 ## How the files connect
 
-- `CMakeLists.txt` defines the `hello_bridge` executable and compiler warnings.
+- `CMakeLists.txt` defines the `bridge_core` library, `betaflight_gazebo_bridge` executable, tests, and compiler warnings.
 - `CMakePresets.json` defines repeatable `debug` and `release` configure/build presets.
 - `.vscode/tasks.json` maps VS Code build tasks to the CMake presets.
-- `.vscode/launch.json` starts GDB against `build/debug/hello_bridge`.
+- `.vscode/launch.json` starts GDB against `build/debug/betaflight_gazebo_bridge`.
 - `.vscode/settings.json` tells VS Code to use CMake presets and the generated compile commands.
 
 ## Next project step
 
-The planning document in `docs/betaflight_gazebo_bridge_plan.md` describes Milestone 0 as a buildable Gazebo system plugin with packet layout tests. After this hello-world bootstrap is confirmed, the next implementation step is to replace the executable-only scaffold with the first shared-library plugin target and add verified packet definitions.
+The next project step is closed-loop validation: configure Betaflight arming and RC behavior, verify motor order with one motor at a time, then tune `max_rotor_velocity_rad_s` and Gazebo motor constants for lift-off.

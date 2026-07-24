@@ -30,6 +30,8 @@ Testing/
 *.temp
 core
 core.*
+eeprom.bin
+sitl_track.gpx
 
 # Local environment files
 .env
@@ -53,8 +55,13 @@ log/
 fuel/
 models/.fuel/
 worlds/.fuel/
+eeprom.bin
+sitl_track.gpx
 
 # Python cache files for future helper scripts
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Local third-party source checkouts
+external/
