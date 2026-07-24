@@ -1,0 +1,9 @@
+#pragma once
+
+namespace betaflight_gazebo_bridge
+{
+
+inline constexpr const char *ProjectName = "@PROJECT_NAME@";
+inline constexpr const char *ProjectVersion = "@PROJECT_VERSION@";
+
+}  // namespace betaflight_gazebo_bridge

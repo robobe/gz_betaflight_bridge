@@ -7,6 +7,7 @@
 
 #include "betaflight_gazebo_bridge/BridgeApp.hh"
 #include "betaflight_gazebo_bridge/Config.hh"
+#include "betaflight_gazebo_bridge/Version.hh"
 
 namespace
 {
@@ -21,13 +22,23 @@ std::filesystem::path ExecutableDirectory(const char *argv0)
     return std::filesystem::absolute(argv0).parent_path();
 }
 
+void PrintUsage(const char *program)
+{
+    std::cout << "Usage: " << program << " [--config path/to/bridge.yaml] [--version]\n";
+}
+
 std::filesystem::path ParseConfigPath(const int argc, char **argv)
 {
     std::filesystem::path configPath = ExecutableDirectory(argv[0]) / "bridge.yaml";
     for (int i = 1; i < argc; ++i) {
         const std::string arg = argv[i];
         if (arg == "--help" || arg == "-h") {
-            std::cout << "Usage: " << argv[0] << " [--config path/to/bridge.yaml]\n";
+            PrintUsage(argv[0]);
+            std::exit(0);
+        }
+        if (arg == "--version") {
+            std::cout << betaflight_gazebo_bridge::ProjectName << " "
+                      << betaflight_gazebo_bridge::ProjectVersion << '\n';
             std::exit(0);
         }
         if (arg == "--config") {
@@ -66,4 +77,3 @@ int main(const int argc, char **argv)
         return 1;
     }
 }
-

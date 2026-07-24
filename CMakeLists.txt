@@ -16,6 +16,12 @@ pkg_check_modules(GZ_MATH REQUIRED IMPORTED_TARGET gz-math7)
 pkg_check_modules(YAML_CPP REQUIRED IMPORTED_TARGET yaml-cpp)
 pkg_check_modules(SPDLOG REQUIRED IMPORTED_TARGET spdlog)
 
+configure_file(
+  cmake/Version.hh.in
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/betaflight_gazebo_bridge/Version.hh
+  @ONLY
+)
+
 add_library(bridge_core
   src/BridgeApp.cc
   src/Config.cc
@@ -24,7 +30,11 @@ add_library(bridge_core
   src/UdpSocket.cc
 )
 
-target_include_directories(bridge_core PUBLIC include)
+target_include_directories(bridge_core
+  PUBLIC
+    include
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
+)
 target_compile_features(bridge_core PUBLIC cxx_std_20)
 target_link_libraries(bridge_core
   PUBLIC
