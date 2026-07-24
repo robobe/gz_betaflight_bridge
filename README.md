@@ -2,6 +2,20 @@
 
 This repository contains a standalone C++ bridge between Betaflight SITL and Gazebo Sim Harmonic. The bridge subscribes to Gazebo IMU and altimeter topics, sends Betaflight FDM packets to SITL, receives Betaflight motor commands, converts them to rotor velocity, and publishes `gz.msgs.Actuators` for Gazebo's multicopter motor model.
 
+## Documentation
+
+Start with:
+
+```text
+docs/index.md
+```
+
+For the main project explanation, requirements, design, plan, and usage, read:
+
+```text
+docs/requirements_design_usage.md
+```
+
 ## Current layout
 
 ```text

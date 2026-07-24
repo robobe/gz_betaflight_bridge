@@ -42,7 +42,7 @@ gz topic -e -t /X3/gazebo/command/motor_speed
 Check SITL UDP sockets:
 
 ```bash
-ss -lunp | rg '9002|9003|9004'
+ss -lunp | grep -E '9002|9003|9004'
 ```
 
 Check bridge logs for:
@@ -54,4 +54,3 @@ Check bridge logs for:
 - `malformed_motor_packets=0`
 
 If motor packets stop, the bridge logs a timeout and publishes zero motor velocity.
-
