@@ -1,0 +1,60 @@
+# CMake build trees
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# Build tool output
+*.ninja
+.ninja_deps
+.ninja_log
+
+# Compiled artifacts
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Runtime logs and temporary files
+*.log
+*.tmp
+*.temp
+core
+core.*
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Editor and language-server caches
+.cache/
+.vscode/ipch/
+.vscode/.browse.VC.db*
+.vscode/*.db
+.vscode/*.db-shm
+.vscode/*.db-wal
+
+# Gazebo runtime output and local downloads
+logs/
+log/
+*.bag
+*.db3
+*.sqlite3
+fuel/
+models/.fuel/
+worlds/.fuel/
+
+# Python cache files for future helper scripts
+__pycache__/
+*.py[cod]
+.pytest_cache/
