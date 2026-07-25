@@ -4,31 +4,37 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 CONFIG_FILE="${PROJECT_ROOT}/config/bridge.yaml"
-LOG_DIR="${PROJECT_ROOT}/logs/takeoff-stack-$(date +%Y%m%d-%H%M%S)"
+LOG_DIR="${PROJECT_ROOT}/logs/msp-hover-stack-$(date +%Y%m%d-%H%M%S)"
 HEADLESS=false
-START_RC=false
-RC_ARGS=(--takeoff-sequence)
+HOVER_ARGS=(--target-altitude 5)
 
 usage() {
   cat <<EOF
-Usage: scripts/run_takeoff_stack.sh [options] [-- rc-args...]
+Usage: scripts/run_msp_hover_stack.sh [options] [-- hover-args...]
 
-Starts Gazebo, Betaflight SITL, and the bridge.
+Starts Gazebo, Betaflight SITL, the C++ bridge, and the MSP hover controller.
 
 Options:
-  --headless          Run Gazebo server-only with -r -s.
-  --udp-rc           Also start the legacy UDP RC takeoff test.
-  --config <file>    Bridge YAML config file. Default: config/bridge.yaml.
-  --ramp-end <us>    RC takeoff ramp end value. Default: send_rc_test.py default.
-  --hold-duration <s>
-                     RC hold duration after ramp. Default: send_rc_test.py default.
-  -h, --help         Show this help.
+  --headless              Run Gazebo server-only with -r -s.
+  --config <file>         Bridge YAML config file. Default: config/bridge.yaml.
+  --target-altitude <m>   Hover target altitude. Default: 5.
+  --duration <s>          Stop hover after this many seconds.
+  --kp <value>            Hover proportional gain.
+  --kd <value>            Hover derivative gain.
+  --hover-throttle <us>   Base hover throttle.
+  --min-throttle <us>     Minimum hover throttle.
+  --max-throttle <us>     Maximum hover throttle.
+  --prearm-duration <s>   Disarmed RC period before arming.
+  --arm-low-duration <s>  Armed low-throttle period before hover.
+  --angle-mode            Enable ANGLE mode through AUX2. Default.
+  --no-angle-mode         Keep AUX2 low for acro/rate mode.
+  -h, --help              Show this help.
 
 Examples:
-  scripts/run_takeoff_stack.sh
-  scripts/run_takeoff_stack.sh --headless
-  scripts/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
-  scripts/run_takeoff_stack.sh -- --takeoff-sequence --ramp-end 1700
+  scripts/run_msp_hover_stack.sh
+  scripts/run_msp_hover_stack.sh --headless --target-altitude 5
+  scripts/run_msp_hover_stack.sh --duration 30 --kp 60 --kd 45 --max-throttle 1650
+  scripts/run_msp_hover_stack.sh -- --target-altitude 5 --host 127.0.0.1 --port 5761
 EOF
 }
 
@@ -38,28 +44,21 @@ while [[ $# -gt 0 ]]; do
       HEADLESS=true
       shift
       ;;
-    --udp-rc)
-      START_RC=true
-      shift
-      ;;
     --config)
       CONFIG_FILE="$2"
       shift 2
       ;;
-    --ramp-end)
-      START_RC=true
-      RC_ARGS+=(--ramp-end "$2")
+    --target-altitude|--duration|--kp|--kd|--hover-throttle|--min-throttle|--max-throttle|--prearm-duration|--arm-low-duration)
+      HOVER_ARGS+=("$1" "$2")
       shift 2
       ;;
-    --hold-duration)
-      START_RC=true
-      RC_ARGS+=(--hold-duration "$2")
-      shift 2
+    --angle-mode|--no-angle-mode)
+      HOVER_ARGS+=("$1")
+      shift
       ;;
     --)
       shift
-      START_RC=true
-      RC_ARGS=("$@")
+      HOVER_ARGS=("$@")
       break
       ;;
     -h|--help)
@@ -86,7 +85,7 @@ cleanup() {
 
   if [[ ${#PIDS[@]} -gt 0 ]]; then
     echo
-    echo "Stopping stack..."
+    echo "Stopping MSP hover stack..."
     for pid in "${PIDS[@]}"; do
       if kill -0 "${pid}" 2>/dev/null; then
         kill "${pid}" 2>/dev/null || true
@@ -159,6 +158,26 @@ wait_for_udp_port() {
   done
 }
 
+wait_for_tcp_port() {
+  local port="$1"
+  local timeout_s="$2"
+  local start
+  start="$(date +%s)"
+
+  while true; do
+    if ss -ltn 2>/dev/null | grep -Eq "[:.]${port}\\b"; then
+      return 0
+    fi
+
+    if (( $(date +%s) - start >= timeout_s )); then
+      echo "Timed out waiting for TCP port: ${port}" >&2
+      return 1
+    fi
+
+    sleep 0.5
+  done
+}
+
 check_alive() {
   local index
   for index in "${!PIDS[@]}"; do
@@ -201,6 +220,7 @@ start_process "sitl" "${LOG_DIR}/sitl.log" \
   "${SCRIPT_DIR}/run_betaflight_sitl.sh"
 wait_for_udp_port 9003 15
 wait_for_udp_port 9004 15
+wait_for_tcp_port 5761 15
 check_alive
 
 start_process "bridge" "${LOG_DIR}/bridge.log" \
@@ -208,33 +228,27 @@ start_process "bridge" "${LOG_DIR}/bridge.log" \
 sleep 3
 check_alive
 
-if [[ "${START_RC}" == true ]]; then
-  start_process "rc" "${LOG_DIR}/rc.log" \
-    "${SCRIPT_DIR}/send_rc_test.py" "${RC_ARGS[@]}"
-fi
+start_process "hover" "${LOG_DIR}/hover.log" \
+  "${SCRIPT_DIR}/hover_msp_controller.py" "${HOVER_ARGS[@]}"
+sleep 1
+check_alive
 
 echo
-echo "Stack is running."
+echo "MSP hover stack is running."
 echo "Logs: ${LOG_DIR}"
 echo "Tail logs with:"
-if [[ "${START_RC}" == true ]]; then
-  echo "  tail -f ${LOG_DIR}/gazebo.log ${LOG_DIR}/sitl.log ${LOG_DIR}/bridge.log ${LOG_DIR}/rc.log"
-else
-  echo "  tail -f ${LOG_DIR}/gazebo.log ${LOG_DIR}/sitl.log ${LOG_DIR}/bridge.log"
-fi
+echo "  tail -f ${LOG_DIR}/gazebo.log ${LOG_DIR}/sitl.log ${LOG_DIR}/bridge.log ${LOG_DIR}/hover.log"
 echo
-echo "Run MSP hover in another terminal with:"
-echo "  scripts/hover_msp_controller.py --target-altitude 5"
-echo
-echo "Press Ctrl+C here to stop Gazebo, SITL, bridge, and optional RC."
+echo "Press Ctrl+C here to stop Gazebo, SITL, bridge, and hover."
 
 while true; do
   sleep 1
 
   for index in "${!PIDS[@]}"; do
     if ! kill -0 "${PIDS[index]}" 2>/dev/null; then
-      if [[ "${NAMES[index]}" == "rc" ]]; then
-        continue
+      if [[ "${NAMES[index]}" == "hover" ]]; then
+        echo "hover exited. Stopping the rest of the stack."
+        exit 0
       fi
 
       echo "${NAMES[index]} exited. Check ${LOG_DIR}/${NAMES[index]}.log" >&2

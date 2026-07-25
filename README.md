@@ -522,27 +522,48 @@ First generate the SITL EEPROM once so AUX1 maps to ARM and AUX2 maps to ANGLE:
 scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
-The easiest way to start the whole stack is:
+The easiest way to start Gazebo, Betaflight SITL, the bridge, and MSP hover is:
+
+```bash
+scripts/run_msp_hover_stack.sh --headless --target-altitude 5
+```
+
+This starts the long-running simulation processes in the correct order and then starts the MSP hover controller after Betaflight's MSP TCP port is ready. It writes logs under:
+
+```text
+logs/msp-hover-stack-YYYYMMDD-HHMMSS/
+```
+
+Stop everything with `Ctrl+C` in the launcher terminal.
+
+Useful MSP hover stack options:
+
+```bash
+scripts/run_msp_hover_stack.sh --target-altitude 5
+scripts/run_msp_hover_stack.sh --duration 30 --kp 60 --kd 45 --max-throttle 1650
+scripts/run_msp_hover_stack.sh -- --target-altitude 5 --host 127.0.0.1 --port 5761
+```
+
+To start only Gazebo, Betaflight SITL, and the bridge:
 
 ```bash
 scripts/run_takeoff_stack.sh
 ```
 
-This starts Gazebo, Betaflight SITL, the bridge, and `send_rc_test.py --takeoff-sequence` in the correct order. It writes logs under:
+This writes logs under:
 
 ```text
 logs/takeoff-stack-YYYYMMDD-HHMMSS/
 ```
 
-Stop everything with `Ctrl+C` in the launcher terminal.
-
-Useful options:
+Useful legacy options:
 
 ```bash
 scripts/run_takeoff_stack.sh --headless
-scripts/run_takeoff_stack.sh --ramp-end 1600 --hold-duration 20
-scripts/run_takeoff_stack.sh --no-rc
+scripts/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
 ```
+
+`--udp-rc` is a legacy smoke-test option. The current EEPROM profile uses MSP RC, so use the MSP hover controller for normal hover tests.
 
 Manual flow, if you want separate terminals:
 
@@ -558,24 +579,59 @@ scripts/run_betaflight_sitl.sh
 scripts/run_bridge.sh
 ```
 
-After the bridge logs `imu=true` and `altimeter=true`, send the RC sequence:
+After the bridge logs `imu=true` and `altimeter=true`, run MSP hover:
 
 ```bash
-scripts/send_rc_test.py --takeoff-sequence
+scripts/hover_msp_controller.py --target-altitude 5
 ```
 
-The sequence sends low-throttle disarmed RC first, then arms at low throttle, then ramps throttle to `2000`. This avoids Betaflight's `NOT_DISARMED` blocker and is strong enough to lift the X3 model through the bridge's default `800 rad/s` motor ceiling.
+The controller sends low-throttle disarmed RC first, arms at low throttle, then controls throttle using `MSP_ALTITUDE`.
 
-For a gentler test:
+Legacy UDP RC smoke test:
 
 ```bash
-scripts/send_rc_test.py --takeoff-sequence --ramp-end 1600
+scripts/run_takeoff_stack.sh --udp-rc --ramp-end 1600
 ```
 
 More details are in:
 
 ```text
 docs/takeoff_test.md
+```
+
+## MSP hover controller
+
+For hover, use MSP instead of the UDP RC helper. The MSP controller reads Betaflight altitude and sends RC through Betaflight's MSP TCP port.
+
+Regenerate EEPROM once:
+
+```bash
+scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+```
+
+Start Gazebo, SITL, bridge, and hover together:
+
+```bash
+scripts/run_msp_hover_stack.sh --target-altitude 5
+```
+
+Or start Gazebo, SITL, and the bridge first:
+
+```bash
+scripts/run_takeoff_stack.sh
+```
+
+Then run hover in another terminal:
+
+```bash
+scripts/hover_msp_controller.py --target-altitude 5
+```
+
+Design and usage docs:
+
+```text
+docs/msp_hover_controller.md
+docs/msp_hover_code_design.md
 ```
 
 ## Configure and build in VS Code
@@ -631,4 +687,4 @@ Before launching GDB, VS Code runs the `CMake: build debug` task. That means cod
 
 ## Next project step
 
-The next project step is closed-loop validation: configure Betaflight arming and RC behavior, verify motor order with one motor at a time, then tune `max_rotor_velocity_rad_s` and Gazebo motor constants for lift-off.
+The next project step is closed-loop validation: verify the default Betaflight Quad X to Gazebo X3 motor map, then tune `max_rotor_velocity_rad_s` and Gazebo motor constants for stable hover.

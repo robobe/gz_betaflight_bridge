@@ -53,12 +53,36 @@ int main()
     SensorSnapshot snapshot;
     snapshot.altitude = 100.0;
     snapshot.verticalVelocity = 2.0;
+    snapshot.angularVelocity = {1.0, 2.0, 3.0};
+    snapshot.linearAcceleration = {4.0, 5.0, 6.0};
+    snapshot.orientationQuat = {0.5, 0.5, 0.5, 0.5};
     const auto packet = builder.Build(snapshot, 12.5);
     assert(packet.timestamp == 12.5);
     assert(packet.positionXyz[2] == 100.0);
     assert(packet.velocityXyz[2] == 2.0);
+    assert(packet.imuAngularVelocityRpy[0] == 1.0);
+    assert(packet.imuAngularVelocityRpy[1] == -2.0);
+    assert(packet.imuAngularVelocityRpy[2] == -3.0);
+    assert(packet.imuLinearAccelerationXyz[0] == 4.0);
+    assert(packet.imuLinearAccelerationXyz[1] == -5.0);
+    assert(packet.imuLinearAccelerationXyz[2] == -6.0);
+    assert(packet.imuOrientationQuat[0] == 0.5);
+    assert(packet.imuOrientationQuat[1] == 0.5);
+    assert(packet.imuOrientationQuat[2] == -0.5);
+    assert(packet.imuOrientationQuat[3] == -0.5);
     assert(packet.pressure > 90000.0);
     assert(packet.pressure < 101325.0);
+
+    FdmConfig passthroughConfig;
+    passthroughConfig.frameMode = "passthrough";
+    FdmBuilder passthroughBuilder(passthroughConfig);
+    const auto passthroughPacket = passthroughBuilder.Build(snapshot, 12.5);
+    assert(passthroughPacket.imuAngularVelocityRpy[1] == 2.0);
+    assert(passthroughPacket.imuAngularVelocityRpy[2] == 3.0);
+    assert(passthroughPacket.imuLinearAccelerationXyz[1] == 5.0);
+    assert(passthroughPacket.imuLinearAccelerationXyz[2] == 6.0);
+    assert(passthroughPacket.imuOrientationQuat[2] == 0.5);
+    assert(passthroughPacket.imuOrientationQuat[3] == 0.5);
 
     return 0;
 }

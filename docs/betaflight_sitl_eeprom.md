@@ -21,14 +21,24 @@ It configures:
 ```text
 AUX1 high = ARM
 AUX2 high = ANGLE
+RX_MSP enabled
+RX_UDP disabled
 ```
 
 The CLI commands are:
 
 ```text
+feature -RX_UDP
+feature RX_MSP
 aux 0 0 0 1700 2100 0 0
 aux 1 1 1 1700 2100 0 0
 save
+```
+
+`RX_MSP` is required for scripts that send RC with `MSP_SET_RAW_RC`, such as:
+
+```text
+scripts/hover_msp_controller.py
 ```
 
 CLI field meaning:
@@ -88,18 +98,19 @@ scripts/run_betaflight_sitl.sh
 
 ## Send RC
 
-Arm and enable ANGLE mode:
+The legacy UDP RC script only works when `RX_UDP` is enabled. The current profile enables `RX_MSP`, so use the MSP hover controller for RC control.
 
 ```bash
-scripts/send_rc_test.py --arm --angle --duration 10
+scripts/hover_msp_controller.py --target-altitude 5
 ```
 
-Arm, enable ANGLE mode, and run the verified Gazebo takeoff sequence:
+To return to UDP RC smoke tests, change the features back to:
 
-```bash
-scripts/send_rc_test.py --takeoff-sequence
+```text
+feature -RX_MSP
+feature RX_UDP
 ```
 
-The takeoff sequence starts with AUX1 low so Betaflight sees a valid disarmed state first. It then arms at low throttle before ramping throttle. Starting the script with AUX1 already high can trigger Betaflight's `NOT_DISARMED` arming blocker.
+The MSP hover sequence starts with AUX1 low so Betaflight sees a valid disarmed state first. It then arms at low throttle before controlling throttle. Starting with AUX1 already high can trigger Betaflight's `NOT_DISARMED` arming blocker.
 
 If motors stay at zero, inspect Betaflight arming flags. The EEPROM config maps the modes, but Betaflight can still block arming for other reasons.

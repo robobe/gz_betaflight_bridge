@@ -22,7 +22,7 @@ flowchart LR
     BR -->|FDM UDP 9003| BF[Betaflight SITL]
     BF -->|Motors UDP 9002| BR
     BR -->|Actuator topic| GZ
-    RC[RC test script] -->|RC UDP 9004| BF
+    HOVER[MSP hover controller] -->|MSP TCP 5761| BF
 ```
 
 ## Slide 4: Runtime Components
@@ -32,8 +32,9 @@ flowchart LR
 - Betaflight SITL binary: `bin/betaflight_SITL.elf`
 - Bridge executable: `build/debug/betaflight_gazebo_bridge`
 - Bridge config: `config/bridge.yaml`
-- RC helper: `scripts/send_rc_test.py`
-- Stack launcher: `scripts/run_takeoff_stack.sh`
+- MSP hover controller: `scripts/hover_msp_controller.py`
+- Full hover stack launcher: `scripts/run_msp_hover_stack.sh`
+- Bridge-only stack launcher: `scripts/run_takeoff_stack.sh`
 
 ## Slide 5: Core Bridge Responsibilities
 
@@ -85,6 +86,7 @@ Important defaults:
 | IMU topic | `/imu` |
 | Altimeter topic | `/altimeter` |
 | Actuator topic | `/X3/gazebo/command/motor_speed` |
+| Motor map | `[1, 2, 3, 0]` |
 | Max rotor velocity | `800 rad/s` |
 
 ## Slide 9: Current Verified Workflow
@@ -139,4 +141,3 @@ Without this plugin, motor commands can arrive but the vehicle will not move.
 - Motor-order verification tools.
 - Launch profiles for hover, takeoff, and failsafe tests.
 - Multi-vehicle support with namespaced topics and unique UDP ports.
-

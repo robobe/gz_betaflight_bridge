@@ -27,12 +27,20 @@ Size: `144` bytes.
 The bridge fills:
 
 - `timestamp`: bridge runtime seconds.
-- `imu_angular_velocity_rpy`: Gazebo IMU angular velocity.
-- `imu_linear_acceleration_xyz`: Gazebo IMU linear acceleration.
-- `imu_orientation_quat`: quaternion as `w, x, y, z`.
+- `imu_angular_velocity_rpy`: IMU angular velocity after `fdm.frame_mode` conversion.
+- `imu_linear_acceleration_xyz`: IMU linear acceleration after `fdm.frame_mode` conversion.
+- `imu_orientation_quat`: quaternion as `w, x, y, z` after `fdm.frame_mode` conversion.
 - `velocity_xyz[2]`: altimeter vertical velocity.
 - `position_xyz[2]`: altimeter vertical position.
 - `pressure`: standard atmosphere pressure from altitude unless disabled.
+
+For `fdm.frame_mode: gazebo_bridge`, the bridge sends the packet convention expected by Betaflight's `SITL_GAZEBO` target:
+
+```text
+angular_velocity:  Gazebo FLU [x, y, z] -> packet [x, -y, -z]
+linear_accel:      Gazebo FLU [x, y, z] -> packet [x, -y, -z]
+quaternion wxyz:   Gazebo FLU-to-ENU [w, x, y, z] -> packet [w, x, -y, -z]
+```
 
 ## Motor packet
 
@@ -65,4 +73,3 @@ struct rc_packet {
 Size: `40` bytes.
 
 The helper script sends centered channels by default and only arms or ramps throttle when explicit flags are passed.
-

@@ -13,8 +13,11 @@ Start here when navigating the project docs.
 | Packet protocol | [packet_protocol.md](packet_protocol.md) | Betaflight UDP packet layout |
 | Motor math | [motor_velocity_math.md](motor_velocity_math.md) | Normalized motor command to rotor velocity |
 | Motor KV and battery | [motor_kv_battery_mapping.md](motor_kv_battery_mapping.md) | Estimating rotor limits from motor and battery data |
+| Coordinate frames | [coordinate_frames.md](coordinate_frames.md) | IMU, quaternion, and frame conversion choices |
 | EEPROM setup | [betaflight_sitl_eeprom.md](betaflight_sitl_eeprom.md) | AUX1 ARM and AUX2 ANGLE setup for SITL |
 | Takeoff test | [takeoff_test.md](takeoff_test.md) | Running and diagnosing the RC takeoff smoke test |
+| MSP hover controller | [msp_hover_controller.md](msp_hover_controller.md) | Hover using MSP altitude and MSP RC |
+| MSP hover code design | [msp_hover_code_design.md](msp_hover_code_design.md) | SOLID module design and diagrams |
 | Observability | [observability.md](observability.md) | Logs, topics, UDP checks, and troubleshooting signals |
 | Future capabilities | [future_capabilities.md](future_capabilities.md) | Ideas to improve simulation realism |
 | Original implementation plan | [betaflight_gazebo_bridge_plan.md](betaflight_gazebo_bridge_plan.md) | Historical milestone plan and deeper design notes |
@@ -25,5 +28,5 @@ Start here when navigating the project docs.
 2. [requirements_design_usage.md](requirements_design_usage.md)
 3. [configuration.md](configuration.md)
 4. [takeoff_test.md](takeoff_test.md)
-5. [future_capabilities.md](future_capabilities.md)
-
+5. [msp_hover_controller.md](msp_hover_controller.md)
+6. [future_capabilities.md](future_capabilities.md)

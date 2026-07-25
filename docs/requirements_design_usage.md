@@ -136,28 +136,44 @@ AUX2 high = ANGLE
 
 ## Usage
 
-Recommended full-stack launch:
+Recommended full-stack MSP hover launch:
 
 ```bash
-scripts/run_takeoff_stack.sh
+scripts/run_msp_hover_stack.sh --headless --target-altitude 5
 ```
 
-Headless launch:
+This starts:
+
+1. Gazebo
+2. Betaflight SITL
+3. C++ bridge
+4. Python MSP hover controller
+
+Logs are written under:
+
+```text
+logs/msp-hover-stack-YYYYMMDD-HHMMSS/
+```
+
+Stop the complete stack with `Ctrl+C`.
+
+Bridge-only stack launch:
 
 ```bash
 scripts/run_takeoff_stack.sh --headless
 ```
 
-Gentler takeoff:
+Legacy UDP RC takeoff smoke test:
 
 ```bash
-scripts/run_takeoff_stack.sh --ramp-end 1600 --hold-duration 20
+scripts/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
 ```
 
-Start the stack without RC:
+Manual MSP hover flow:
 
 ```bash
-scripts/run_takeoff_stack.sh --no-rc
+scripts/run_takeoff_stack.sh
+scripts/hover_msp_controller.py --target-altitude 5
 ```
 
 Manual launch order:
@@ -166,7 +182,7 @@ Manual launch order:
 scripts/run_quadcopter_world.sh
 scripts/run_betaflight_sitl.sh
 scripts/run_bridge.sh
-scripts/send_rc_test.py --takeoff-sequence
+scripts/hover_msp_controller.py --target-altitude 5
 ```
 
 The dependency order matters:
@@ -174,7 +190,25 @@ The dependency order matters:
 1. Gazebo first, so sensor and actuator topics exist.
 2. SITL second, so UDP ports are open.
 3. Bridge third, so it can connect Gazebo and SITL.
-4. RC last, so Betaflight can arm after FDM traffic exists.
+4. Hover controller last, so Betaflight can arm after FDM traffic exists and MSP is listening.
+
+The default motor map is:
+
+```yaml
+motors:
+  map: [1, 2, 3, 0]
+```
+
+This maps Betaflight Quad X motor order to the Gazebo X3 actuator order.
+
+The default FDM frame mode is:
+
+```yaml
+fdm:
+  frame_mode: gazebo_bridge
+```
+
+Keep this mode when using Betaflight's `SITL_GAZEBO` target. Wrong IMU frame signs make ANGLE mode correct in the wrong direction, which shows up as hard oscillation or a flip after arming.
 
 ## Validation
 
@@ -224,4 +258,3 @@ Longer-term plan:
 3. Add wind and disturbance models.
 4. Add GPS and barometer realism.
 5. Add failure injection for motors, sensors, and network traffic.
-
