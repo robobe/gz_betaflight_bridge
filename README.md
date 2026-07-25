@@ -377,6 +377,12 @@ Send a simple lift command from another terminal with:
 gz topic -t /X3/gazebo/command/motor_speed --msgtype gz.msgs.Actuators -p 'velocity:[700, 700, 700, 700]'
 ```
 
+The detailed world and motor-model tuning guide is:
+
+```text
+docs/gazebo_world_motor_model.md
+```
+
 Stop the motors with:
 
 ```bash

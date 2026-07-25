@@ -13,6 +13,7 @@ Start here when navigating the project docs.
 | Packet protocol | [packet_protocol.md](packet_protocol.md) | Betaflight UDP packet layout |
 | Motor math | [motor_velocity_math.md](motor_velocity_math.md) | Normalized motor command to rotor velocity |
 | Motor KV and battery | [motor_kv_battery_mapping.md](motor_kv_battery_mapping.md) | Estimating rotor limits from motor and battery data |
+| Gazebo motor model | [gazebo_world_motor_model.md](gazebo_world_motor_model.md) | World structure and deep tuning of `MulticopterMotorModel` |
 | Coordinate frames | [coordinate_frames.md](coordinate_frames.md) | IMU, quaternion, and frame conversion choices |
 | EEPROM setup | [betaflight_sitl_eeprom.md](betaflight_sitl_eeprom.md) | AUX1 ARM and AUX2 ANGLE setup for SITL |
 | Takeoff test | [takeoff_test.md](takeoff_test.md) | Running and diagnosing the RC takeoff smoke test |
