@@ -1,0 +1,20 @@
+# Betaflight SITL mode setup for legacy UDP RC on port 9004.
+#
+# Use this profile when controlling SITL with:
+# - scripts/send_rc_test.py
+# - scripts/joystick_rc_udp.py
+#
+# The MSP hover and square controllers require the opposite profile:
+# config/betaflight/sitl_modes.cli
+
+# Enable SITL UDP RC and disable MSP RC.
+feature -RX_MSP
+feature RX_UDP
+
+# AUX1 high arms.
+aux 0 0 0 1700 2100 0 0
+
+# AUX2 high enables ANGLE mode.
+aux 1 1 1 1700 2100 0 0
+
+save

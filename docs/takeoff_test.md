@@ -58,6 +58,12 @@ This checks that AUX1 high arms and AUX2 high enables ANGLE mode. It is not a ta
 
 The UDP RC script is still useful for old smoke tests, but the current EEPROM profile enables `RX_MSP` for MSP hover. To use UDP RC again, switch Betaflight back to `RX_UDP`.
 
+Stop the stack, then generate the UDP EEPROM profile once:
+
+```bash
+scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_udp_modes.cli
+```
+
 Use the continuous UDP takeoff sequence after Gazebo, SITL, and the bridge are running:
 
 ```bash

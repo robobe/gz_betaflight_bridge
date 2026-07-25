@@ -6,18 +6,34 @@ PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 CONFIG_FILE="${PROJECT_ROOT}/config/bridge.yaml"
 LOG_DIR="${PROJECT_ROOT}/logs/msp-hover-stack-$(date +%Y%m%d-%H%M%S)"
 HEADLESS=false
-HOVER_ARGS=(--target-altitude 5)
+MISSION="hover"
+MISSION_ARGS=(--target-altitude 5)
 
 usage() {
   cat <<EOF
-Usage: scripts/run_msp_hover_stack.sh [options] [-- hover-args...]
+Usage: scripts/run_msp_hover_stack.sh [options] [-- mission-args...]
 
-Starts Gazebo, Betaflight SITL, the C++ bridge, and the MSP hover controller.
+Starts Gazebo, Betaflight SITL, the C++ bridge, and an MSP mission controller.
 
 Options:
   --headless              Run Gazebo server-only with -r -s.
   --config <file>         Bridge YAML config file. Default: config/bridge.yaml.
+  --mission <name>        MSP mission to run: hover or square. Default: hover.
   --target-altitude <m>   Hover target altitude. Default: 5.
+  --takeoff-altitude <m>  Square mission takeoff altitude. Default: 4.
+  --start-square-altitude <m>
+                          Start square legs once this altitude is reached, even
+                          if --takeoff-altitude has not settled. Default: 0
+                          means wait for --takeoff-altitude.
+  --square-side <m>       Square mission side length. Default: 6.
+  --max-horizontal-speed <m/s>
+                          Square mission horizontal speed cap. Default: 1.
+  --rc-us-per-mps <us>   Square mission RC stick authority per m/s. Default: 250.
+  --ki-position <value>  Square mission position integral gain. Default: 0.05.
+  --roll-min <us>        Square mission minimum roll command. Default: 1200.
+  --roll-max <us>        Square mission maximum roll command. Default: 1800.
+  --pitch-min <us>       Square mission minimum pitch command. Default: 1200.
+  --pitch-max <us>       Square mission maximum pitch command. Default: 1800.
   --duration <s>          Stop hover after this many seconds.
   --kp <value>            Hover proportional gain.
   --kd <value>            Hover derivative gain.
@@ -33,6 +49,8 @@ Options:
 Examples:
   scripts/run_msp_hover_stack.sh
   scripts/run_msp_hover_stack.sh --headless --target-altitude 5
+  scripts/run_msp_hover_stack.sh --mission square
+  scripts/run_msp_hover_stack.sh --mission square --takeoff-altitude 4 --start-square-altitude 1.5 --square-side 6
   scripts/run_msp_hover_stack.sh --duration 30 --kp 60 --kd 45 --max-throttle 1650
   scripts/run_msp_hover_stack.sh -- --target-altitude 5 --host 127.0.0.1 --port 5761
 EOF
@@ -48,17 +66,35 @@ while [[ $# -gt 0 ]]; do
       CONFIG_FILE="$2"
       shift 2
       ;;
+    --mission)
+      MISSION="$2"
+      if [[ "${MISSION}" != "hover" && "${MISSION}" != "square" ]]; then
+        echo "Unknown mission: ${MISSION}" >&2
+        usage >&2
+        exit 2
+      fi
+      if [[ "${MISSION}" == "hover" ]]; then
+        MISSION_ARGS=(--target-altitude 5)
+      else
+        MISSION_ARGS=()
+      fi
+      shift 2
+      ;;
     --target-altitude|--duration|--kp|--kd|--hover-throttle|--min-throttle|--max-throttle|--prearm-duration|--arm-low-duration)
-      HOVER_ARGS+=("$1" "$2")
+      MISSION_ARGS+=("$1" "$2")
+      shift 2
+      ;;
+    --takeoff-altitude|--start-square-altitude|--square-side|--max-horizontal-speed|--descent-rate|--position-tolerance|--max-leg-duration|--max-mission-duration|--rc-us-per-mps|--roll-min|--roll-max|--pitch-min|--pitch-max|--kp-position|--ki-position|--kd-position|--position-integral-limit)
+      MISSION_ARGS+=("$1" "$2")
       shift 2
       ;;
     --angle-mode|--no-angle-mode)
-      HOVER_ARGS+=("$1")
+      MISSION_ARGS+=("$1")
       shift
       ;;
     --)
       shift
-      HOVER_ARGS=("$@")
+      MISSION_ARGS=("$@")
       break
       ;;
     -h|--help)
@@ -116,6 +152,19 @@ start_process() {
   PIDS+=("${pid}")
   NAMES+=("${name}")
   echo "  pid=${pid} log=${logfile}"
+}
+
+start_process_with_console_log() {
+  local name="$1"
+  local logfile="$2"
+  shift 2
+
+  echo "Starting ${name}..."
+  "$@" > >(tee "${logfile}") 2>&1 &
+  local pid=$!
+  PIDS+=("${pid}")
+  NAMES+=("${name}")
+  echo "  pid=${pid} log=${logfile} console=on"
 }
 
 wait_for_topic() {
@@ -214,6 +263,9 @@ start_process "gazebo" "${LOG_DIR}/gazebo.log" \
 wait_for_topic "/imu" 30
 wait_for_topic "/altimeter" 30
 wait_for_topic "/X3/gazebo/command/motor_speed" 30
+if [[ "${MISSION}" == "square" ]]; then
+  wait_for_topic "/world/quadcopter/dynamic_pose/info" 30
+fi
 check_alive
 
 start_process "sitl" "${LOG_DIR}/sitl.log" \
@@ -228,27 +280,38 @@ start_process "bridge" "${LOG_DIR}/bridge.log" \
 sleep 3
 check_alive
 
-start_process "hover" "${LOG_DIR}/hover.log" \
-  "${SCRIPT_DIR}/hover_msp_controller.py" "${HOVER_ARGS[@]}"
+if [[ "${MISSION}" == "hover" ]]; then
+  MISSION_NAME="hover"
+  MISSION_SCRIPT="${SCRIPT_DIR}/hover_msp_controller.py"
+else
+  MISSION_NAME="square"
+  MISSION_SCRIPT="${SCRIPT_DIR}/msp_square_mission.py"
+fi
+
+start_process_with_console_log "${MISSION_NAME}" "${LOG_DIR}/${MISSION_NAME}.log" \
+  "${MISSION_SCRIPT}" "${MISSION_ARGS[@]}"
 sleep 1
 check_alive
 
 echo
-echo "MSP hover stack is running."
+echo "MSP ${MISSION} stack is running."
 echo "Logs: ${LOG_DIR}"
+echo "${MISSION_NAME} state logs are also printed in this terminal."
 echo "Tail logs with:"
-echo "  tail -f ${LOG_DIR}/gazebo.log ${LOG_DIR}/sitl.log ${LOG_DIR}/bridge.log ${LOG_DIR}/hover.log"
+echo "  tail -f ${LOG_DIR}/gazebo.log ${LOG_DIR}/sitl.log ${LOG_DIR}/bridge.log ${LOG_DIR}/${MISSION_NAME}.log"
 echo
-echo "Press Ctrl+C here to stop Gazebo, SITL, bridge, and hover."
+echo "Press Ctrl+C here to stop Gazebo, SITL, bridge, and ${MISSION_NAME}."
 
 while true; do
   sleep 1
 
   for index in "${!PIDS[@]}"; do
     if ! kill -0 "${PIDS[index]}" 2>/dev/null; then
-      if [[ "${NAMES[index]}" == "hover" ]]; then
-        echo "hover exited. Stopping the rest of the stack."
-        exit 0
+      if [[ "${NAMES[index]}" == "hover" || "${NAMES[index]}" == "square" ]]; then
+        status=0
+        wait "${PIDS[index]}" || status=$?
+        echo "${NAMES[index]} exited with status ${status}. Stopping the rest of the stack."
+        exit "${status}"
       fi
 
       echo "${NAMES[index]} exited. Check ${LOG_DIR}/${NAMES[index]}.log" >&2

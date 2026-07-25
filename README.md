@@ -514,6 +514,32 @@ The motor receiver should then print packets from `127.0.0.1`.
 
 At this stage the values may be zero or idle-level because the flight controller is not armed and no RC input is being sent. Seeing packets on `9002` only proves the SITL FDM-to-motor-output loop is alive. To see throttle-dependent motor values later, the bridge must provide FDM continuously and RC/MSP configuration must arm the vehicle and command throttle.
 
+## Joystick RC over UDP 9004
+
+Joystick RC uses Betaflight SITL UDP RC, so generate the UDP EEPROM profile once:
+
+```bash
+scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_udp_modes.cli
+```
+
+Calibrate `/dev/input/js0` once:
+
+```bash
+scripts/joystick_rc_udp.py calibrate --device /dev/input/js0
+```
+
+Then send live joystick RC packets to Betaflight SITL:
+
+```bash
+scripts/joystick_rc_udp.py run --device /dev/input/js0
+```
+
+The calibration asks you to move roll, pitch, throttle, and yaw, then press the ARM and ANGLE controls. Details:
+
+```text
+docs/joystick_rc.md
+```
+
 ## Full-stack takeoff test
 
 First generate the SITL EEPROM once so AUX1 maps to ARM and AUX2 maps to ANGLE:
@@ -632,6 +658,38 @@ Design and usage docs:
 ```text
 docs/msp_hover_controller.md
 docs/msp_hover_code_design.md
+```
+
+## MSP square mission
+
+The square mission uses Gazebo pose feedback and MSP RC. It takes off, flies a closed-loop square with horizontal speed capped to `1 m/s`, descends at `1 m/s`, lands, and disarms.
+
+```bash
+scripts/run_msp_hover_stack.sh --mission square
+```
+
+The mission controller now prints its state log in the same terminal while also saving it to `logs/.../square.log`. If the vehicle climbs but does not settle at the default `4 m` takeoff target, allow the square legs to start at a lower safe altitude:
+
+```bash
+scripts/run_msp_hover_stack.sh --mission square -- --start-square-altitude 1.5
+```
+
+If the drone reaches takeoff altitude but does not move enough in roll or pitch, increase stick authority while keeping the `1 m/s` speed cap:
+
+```bash
+scripts/run_msp_hover_stack.sh --mission square -- --rc-us-per-mps 300 --roll-min 1100 --roll-max 1900 --pitch-min 1100 --pitch-max 1900
+```
+
+Smoke-test with smaller values:
+
+```bash
+scripts/run_msp_hover_stack.sh --headless --mission square -- --takeoff-altitude 0.1 --square-side 0.1 --max-horizontal-speed 0.2 --max-mission-duration 35 --position-tolerance 0.3 --landing-altitude 0.15
+```
+
+Details:
+
+```text
+docs/msp_square_mission.md
 ```
 
 ## Configure and build in VS Code
