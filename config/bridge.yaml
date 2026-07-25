@@ -11,12 +11,13 @@ gazebo:
 
 fdm:
   rate_hz: 500
+  frame_mode: gazebo_bridge
   pressure_mode: from_altitude
   sea_level_pressure_pa: 101325.0
 
 motors:
   input: normalized_9002
-  map: [0, 1, 2, 3]
+  map: [1, 2, 3, 0]
   min_rotor_velocity_rad_s: 0.0
   max_rotor_velocity_rad_s: 800.0
   timeout_seconds: 0.10

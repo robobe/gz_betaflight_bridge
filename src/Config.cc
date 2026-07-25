@@ -51,6 +51,7 @@ BridgeConfig ConfigLoader::Load(const std::filesystem::path &path)
 
     const auto fdm = root["fdm"];
     ReadScalar(fdm, "rate_hz", config.fdm.rateHz);
+    ReadScalar(fdm, "frame_mode", config.fdm.frameMode);
     ReadScalar(fdm, "pressure_mode", config.fdm.pressureMode);
     ReadScalar(fdm, "sea_level_pressure_pa", config.fdm.seaLevelPressurePa);
 
@@ -86,6 +87,9 @@ void ConfigLoader::Validate(const BridgeConfig &config)
     if (config.fdm.rateHz <= 0.0) {
         throw std::runtime_error("fdm.rate_hz must be positive");
     }
+    if (config.fdm.frameMode != "gazebo_bridge" && config.fdm.frameMode != "passthrough") {
+        throw std::runtime_error("fdm.frame_mode must be 'gazebo_bridge' or 'passthrough'");
+    }
     if (config.fdm.seaLevelPressurePa <= 0.0) {
         throw std::runtime_error("fdm.sea_level_pressure_pa must be positive");
     }
@@ -112,4 +116,3 @@ void ConfigLoader::Validate(const BridgeConfig &config)
 }
 
 }  // namespace betaflight_gazebo_bridge
-

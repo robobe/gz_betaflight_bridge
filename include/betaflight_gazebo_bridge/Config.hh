@@ -26,6 +26,7 @@ struct GazeboConfig
 struct FdmConfig
 {
     double rateHz{500.0};
+    std::string frameMode{"gazebo_bridge"};
     std::string pressureMode{"from_altitude"};
     double seaLevelPressurePa{101325.0};
 };

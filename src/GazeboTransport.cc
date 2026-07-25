@@ -21,6 +21,19 @@ double PressureFromAltitude(double altitudeMeters, const double seaLevelPressure
     return seaLevelPressurePa * std::pow(base, 5.25588);
 }
 
+std::array<double, 3> FluVectorToFrdSensor(const std::array<double, 3> &flu)
+{
+    return {flu[0], -flu[1], -flu[2]};
+}
+
+std::array<double, 4> FluBodyToEnuWorldQuatToGazeboBridgeQuat(const std::array<double, 4> &quat)
+{
+    // Betaflight SITL_GAZEBO expects the packet quaternion as if the Gazebo IMU
+    // sensor is Rx(pi) from the FLU body: q_plugin = Rx(pi) * q_flu_enu * Rx(pi).
+    // q and -q are equivalent, so keep w positive for easier log inspection.
+    return {quat[0], quat[1], -quat[2], -quat[3]};
+}
+
 }  // namespace
 
 GazeboStateSubscriber::GazeboStateSubscriber(const GazeboConfig &config)
@@ -105,20 +118,24 @@ FdmPacket FdmBuilder::Build(const SensorSnapshot &snapshot, const double timesta
 {
     FdmPacket packet{};
     packet.timestamp = timestampSeconds;
+    const bool gazeboBridgeFrame = config_.frameMode == "gazebo_bridge";
+    const auto angularVelocity = gazeboBridgeFrame ? FluVectorToFrdSensor(snapshot.angularVelocity) : snapshot.angularVelocity;
+    const auto linearAcceleration = gazeboBridgeFrame ? FluVectorToFrdSensor(snapshot.linearAcceleration) : snapshot.linearAcceleration;
+    const auto orientationQuat = gazeboBridgeFrame ? FluBodyToEnuWorldQuatToGazeboBridgeQuat(snapshot.orientationQuat) : snapshot.orientationQuat;
+
     for (std::size_t i = 0; i < 3; ++i) {
-        packet.imuAngularVelocityRpy[i] = snapshot.angularVelocity[i];
-        packet.imuLinearAccelerationXyz[i] = snapshot.linearAcceleration[i];
+        packet.imuAngularVelocityRpy[i] = angularVelocity[i];
+        packet.imuLinearAccelerationXyz[i] = linearAcceleration[i];
         packet.velocityXyz[i] = 0.0;
         packet.positionXyz[i] = 0.0;
     }
     packet.velocityXyz[2] = snapshot.verticalVelocity;
     packet.positionXyz[2] = snapshot.altitude;
     for (std::size_t i = 0; i < 4; ++i) {
-        packet.imuOrientationQuat[i] = snapshot.orientationQuat[i];
+        packet.imuOrientationQuat[i] = orientationQuat[i];
     }
     packet.pressure = config_.pressureMode == "zero" ? 0.0 : PressureFromAltitude(snapshot.altitude, config_.seaLevelPressurePa);
     return packet;
 }
 
 }  // namespace betaflight_gazebo_bridge
-
