@@ -26,7 +26,7 @@
     "axis": 2,
     "invert": false
   },
-  "throttle_expo": 0.35,
+  "throttle_expo": 0.0,
   "yaw": {
     "axis": 3,
     "center": 0,

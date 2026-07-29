@@ -19,7 +19,7 @@ motors:
   input: normalized_9002
   map: [1, 2, 3, 0]
   min_rotor_velocity_rad_s: 0.0
-  max_rotor_velocity_rad_s: 800.0
+  max_rotor_velocity_rad_s: 1000.0
   timeout_seconds: 0.10
   publish_zero_on_timeout: true
 

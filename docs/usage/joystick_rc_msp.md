@@ -133,7 +133,7 @@ Example shape:
   },
   "deadzone": 0.05,
   "axis_expo": 0.35,
-  "throttle_expo": 0.35,
+  "throttle_expo": 0.0,
   "min_rc": 1000,
   "mid_rc": 1500,
   "max_rc": 2000
@@ -167,6 +167,43 @@ Response fields:
 | `max_rc` | High RC endpoint |
 
 If an axis moves in the wrong direction, flip `invert` for that axis and restart the script.
+
+## Throttle tuning
+
+If takeoff needs almost full stick, first make throttle response linear:
+
+```json
+"throttle_expo": 0.0
+```
+
+If hover still happens too high on the stick, increase the rotor speed limit in both files:
+
+```yaml
+# config/bridge.yaml
+motors:
+  max_rotor_velocity_rad_s: 1000.0
+```
+
+```xml
+<!-- worlds/quadcopter.sdf -->
+<maxRotVelocity>1000.0</maxRotVelocity>
+```
+
+Keep those two values the same. The bridge converts Betaflight's normalized motor output into rad/s, and Gazebo's motor model clamps accepted rotor speed with `<maxRotVelocity>`.
+
+The current tuning target changes the estimated hover fraction from:
+
+```text
+660 / 800 = 0.825
+```
+
+to:
+
+```text
+660 / 1000 = 0.66
+```
+
+If the drone becomes too sensitive or climbs too aggressively, reduce both values to `900.0`.
 
 ## Troubleshooting
 
