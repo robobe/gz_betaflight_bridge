@@ -17,7 +17,7 @@ Start here when navigating the project docs.
 | Coordinate frames | [coordinate_frames.md](coordinate_frames.md) | IMU, quaternion, and frame conversion choices |
 | EEPROM setup | [betaflight_sitl_eeprom.md](betaflight_sitl_eeprom.md) | AUX1 ARM and AUX2 ANGLE setup for SITL |
 | Takeoff test | [takeoff_test.md](takeoff_test.md) | Running and diagnosing the RC takeoff smoke test |
-| Joystick RC | [joystick_rc.md](joystick_rc.md) | Calibrating a joystick and sending RC to UDP 9004 |
+| Joystick RC | [joystick_rc.md](joystick_rc.md) | Calibrating a joystick and sending RC through MSP or UDP |
 | MSP hover Python usage | [usage/msp_hover_python.md](usage/msp_hover_python.md) | Direct `hover_msp_controller.py` run flow, PID tuning, and VS Code stack task |
 | MSP hover controller | [msp_hover_controller.md](msp_hover_controller.md) | Hover using MSP altitude and MSP RC |
 | MSP square mission | [msp_square_mission.md](msp_square_mission.md) | Closed-loop takeoff, square flight, landing, and disarm |

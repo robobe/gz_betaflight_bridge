@@ -1,11 +1,11 @@
 {
   "angle": {
-    "button": 3,
-    "toggle": true
+    "button": 1,
+    "toggle": false
   },
   "arm": {
-    "button": 6,
-    "toggle": true
+    "button": 3,
+    "toggle": false
   },
   "axis_expo": 0.35,
   "deadzone": 0.05,
@@ -15,7 +15,7 @@
   "pitch": {
     "axis": 1,
     "center": 0,
-    "invert": false
+    "invert": true
   },
   "roll": {
     "axis": 0,
@@ -24,7 +24,6 @@
   },
   "throttle": {
     "axis": 2,
-    "center": 5496,
     "invert": false
   },
   "throttle_expo": 0.35,

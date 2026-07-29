@@ -1,6 +1,60 @@
-# Joystick RC over UDP 9004
+# Joystick RC
 
-This tool reads a Linux joystick device, usually `/dev/input/js0`, and sends Betaflight SITL RC packets to UDP port `9004`.
+The joystick tools read a Linux joystick device, usually `/dev/input/js0`, and map it to Betaflight RC channels.
+
+Two send paths are available:
+
+| Script | Betaflight receiver mode | Use case |
+|---|---|---|
+| `scripts/joystick_rc_msp.py` | `RX_MSP` | Current MSP workflow, same profile used by MSP hover |
+| `scripts/joystick_rc_udp.py` | `RX_UDP` | Legacy UDP RC smoke tests on port `9004` |
+
+Both scripts share the same mapping file:
+
+```text
+config/joystick_rc.json
+```
+
+## MSP joystick RC
+
+The MSP joystick script sends RC with `MSP_SET_RAW_RC` to Betaflight MSP TCP, default `127.0.0.1:5761`.
+
+Use the MSP EEPROM profile:
+
+```bash
+scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+```
+
+Start Gazebo, SITL, the bridge, and websockify with VS Code:
+
+```text
+Command Palette -> Tasks: Run Task -> Stack: run all
+```
+
+Then run:
+
+```bash
+scripts/joystick_rc_msp.py run --device /dev/input/js0
+```
+
+Useful MSP options:
+
+```bash
+scripts/joystick_rc_msp.py run --device /dev/input/js0 --host 127.0.0.1 --port 5761 --rate 50
+scripts/joystick_rc_msp.py run --device /dev/input/js0 --config config/my_joystick.json
+```
+
+The script prints live RC state:
+
+```text
+rc: roll=1500 pitch=1500 throttle=1000 yaw=1500 arm=0 angle=0
+```
+
+Keep throttle low before enabling ARM. On exit, the script sends a short disarm burst with throttle low and AUX1 low.
+
+## UDP joystick RC
+
+The UDP joystick tool sends Betaflight SITL RC packets to UDP port `9004`.
 
 It uses the same UDP packet format as `scripts/send_rc_test.py`:
 
@@ -20,12 +74,12 @@ Channel mapping:
 | 5 | AUX1 | ARM button or switch |
 | 6 | AUX2 | ANGLE button or switch |
 
-## Calibration plan
+## Calibration
 
 Run calibration once:
 
 ```bash
-scripts/joystick_rc_udp.py calibrate --device /dev/input/js0
+scripts/joystick_rc_msp.py calibrate --device /dev/input/js0
 ```
 
 The script asks you to:
@@ -48,7 +102,13 @@ It saves the detected mapping to:
 config/joystick_rc.json
 ```
 
-## Run
+You can also calibrate through the UDP wrapper. It writes the same config format:
+
+```bash
+scripts/joystick_rc_udp.py calibrate --device /dev/input/js0
+```
+
+## Run UDP
 
 The joystick sends legacy UDP RC, so Betaflight must use `RX_UDP`.
 
@@ -64,7 +124,7 @@ Start Gazebo, SITL, and the bridge:
 scripts/run_takeoff_stack.sh
 ```
 
-Then run:
+Then run UDP RC:
 
 ```bash
 scripts/joystick_rc_udp.py run --device /dev/input/js0
@@ -130,7 +190,7 @@ If one axis is reversed, edit its `invert` value in `config/joystick_rc.json` an
 }
 ```
 
-## Useful options
+## Useful UDP options
 
 ```bash
 scripts/joystick_rc_udp.py run --device /dev/input/js0 --ip 127.0.0.1 --port 9004 --rate 50
@@ -152,7 +212,7 @@ If permission is denied, add your user to the `input` group and log out/in:
 sudo usermod -aG input "$USER"
 ```
 
-If Betaflight does not react:
+If UDP Betaflight does not react:
 
 ```bash
 ss -lunp | grep 9004
@@ -160,7 +220,15 @@ ss -lunp | grep 9004
 
 Make sure SITL is running and listening on UDP `9004`.
 
-If you later use the MSP hover or square controllers again, switch back to the MSP EEPROM profile:
+If MSP Betaflight does not react:
+
+```bash
+ss -ltnp | grep 5761
+```
+
+Make sure SITL is running and listening on MSP TCP `5761`, and that the MSP EEPROM profile is loaded.
+
+If you later use the MSP hover, MSP joystick, or square controllers again, switch back to the MSP EEPROM profile:
 
 ```bash
 scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
