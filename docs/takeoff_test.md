@@ -122,13 +122,13 @@ Regenerate EEPROM once after enabling MSP RC:
 scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
-Start the full MSP hover stack:
+Start Gazebo, Betaflight SITL, the bridge, and websockify with the VS Code task:
 
-```bash
-scripts/run_msp_hover_stack.sh --headless --target-altitude 5
+```text
+Command Palette -> Tasks: Run Task -> Stack: run all
 ```
 
-For debugging, start only Gazebo, SITL, and the bridge:
+For terminal-only debugging, start only Gazebo, SITL, and the bridge:
 
 ```bash
 scripts/run_takeoff_stack.sh
@@ -137,12 +137,13 @@ scripts/run_takeoff_stack.sh
 Then run hover in another terminal:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5
+scripts/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 See:
 
 ```text
+docs/usage/msp_hover_python.md
 docs/msp_hover_controller.md
 docs/msp_hover_code_design.md
 ```

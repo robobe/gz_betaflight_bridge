@@ -52,6 +52,88 @@
       "dependsOn": [
         "CMake: build debug"
       ]
+    },
+    {
+      "label": "Stack: gazebo",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_quadcopter_world.sh",
+      "args": [
+        "-r"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "group": "betaflight-stack",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stack: sitl",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_betaflight_sitl.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "group": "betaflight-stack",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stack: bridge",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_bridge.sh",
+      "args": [
+        "${workspaceFolder}/config/bridge.yaml"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "group": "betaflight-stack",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "dependsOn": [
+        "CMake: build debug"
+      ]
+    },
+    {
+      "label": "Stack: websockify",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "websockify",
+        "127.0.0.1:6761",
+        "127.0.0.1:5761"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "group": "betaflight-stack",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stack: run all",
+      "dependsOn": [
+        "Stack: gazebo",
+        "Stack: sitl",
+        "Stack: bridge",
+        "Stack: websockify"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
     }
   ]
 }

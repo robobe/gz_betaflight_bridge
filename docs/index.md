@@ -18,6 +18,7 @@ Start here when navigating the project docs.
 | EEPROM setup | [betaflight_sitl_eeprom.md](betaflight_sitl_eeprom.md) | AUX1 ARM and AUX2 ANGLE setup for SITL |
 | Takeoff test | [takeoff_test.md](takeoff_test.md) | Running and diagnosing the RC takeoff smoke test |
 | Joystick RC | [joystick_rc.md](joystick_rc.md) | Calibrating a joystick and sending RC to UDP 9004 |
+| MSP hover Python usage | [usage/msp_hover_python.md](usage/msp_hover_python.md) | Direct `hover_msp_controller.py` run flow, PID tuning, and VS Code stack task |
 | MSP hover controller | [msp_hover_controller.md](msp_hover_controller.md) | Hover using MSP altitude and MSP RC |
 | MSP square mission | [msp_square_mission.md](msp_square_mission.md) | Closed-loop takeoff, square flight, landing, and disarm |
 | MSP hover code design | [msp_hover_code_design.md](msp_hover_code_design.md) | SOLID module design and diagrams |
@@ -32,6 +33,7 @@ Start here when navigating the project docs.
 3. [configuration.md](configuration.md)
 4. [takeoff_test.md](takeoff_test.md)
 5. [joystick_rc.md](joystick_rc.md)
-6. [msp_hover_controller.md](msp_hover_controller.md)
-7. [msp_square_mission.md](msp_square_mission.md)
-8. [future_capabilities.md](future_capabilities.md)
+6. [usage/msp_hover_python.md](usage/msp_hover_python.md)
+7. [msp_hover_controller.md](msp_hover_controller.md)
+8. [msp_square_mission.md](msp_square_mission.md)
+9. [future_capabilities.md](future_capabilities.md)

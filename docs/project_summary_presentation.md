@@ -33,7 +33,7 @@ flowchart LR
 - Bridge executable: `build/debug/betaflight_gazebo_bridge`
 - Bridge config: `config/bridge.yaml`
 - MSP hover controller: `scripts/hover_msp_controller.py`
-- Full hover stack launcher: `scripts/run_msp_hover_stack.sh`
+- VS Code stack task: `Stack: run all`
 - Bridge-only stack launcher: `scripts/run_takeoff_stack.sh`
 
 ## Slide 5: Core Bridge Responsibilities

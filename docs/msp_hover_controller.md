@@ -55,34 +55,22 @@ AUX2 high = ANGLE
 
 ## Usage
 
-Start Gazebo, Betaflight SITL, the bridge, and hover together:
+Start Gazebo, Betaflight SITL, the bridge, and websockify with the VS Code task:
 
-```bash
-scripts/run_msp_hover_stack.sh --headless --target-altitude 5
+```text
+Command Palette -> Tasks: Run Task -> Stack: run all
 ```
 
-Run for a fixed time and stop the stack after hover exits:
-
-```bash
-scripts/run_msp_hover_stack.sh --duration 30 --target-altitude 5
-```
-
-Run without ANGLE mode while debugging attitude-frame or motor-map issues:
-
-```bash
-scripts/run_msp_hover_stack.sh --duration 30 --target-altitude 5 --no-angle-mode
-```
-
-Manual flow for debugging:
-
-```bash
-scripts/run_takeoff_stack.sh
-```
-
-Then run the hover controller in another terminal:
+Then run the hover controller in a separate terminal:
 
 ```bash
 scripts/hover_msp_controller.py --target-altitude 5
+```
+
+For the full direct Python workflow, including PID tuning and the Gazebo hover view, see:
+
+```text
+docs/usage/msp_hover_python.md
 ```
 
 Run with gentler output:
@@ -91,10 +79,22 @@ Run with gentler output:
 scripts/hover_msp_controller.py --target-altitude 5 --kp 60 --kd 45 --max-throttle 1650
 ```
 
+Run with integral correction to close steady-state altitude error:
+
+```bash
+scripts/hover_msp_controller.py --target-altitude 5 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+```
+
 Run for a fixed time:
 
 ```bash
 scripts/hover_msp_controller.py --target-altitude 5 --duration 30
+```
+
+When `--duration` is set, the controller descends before disarming. Tune that phase with:
+
+```bash
+scripts/hover_msp_controller.py --target-altitude 5 --duration 30 --descent-duration 8 --landing-altitude 0.15
 ```
 
 ## Arm Sequence
@@ -126,7 +126,8 @@ The first implementation uses a simple PD throttle controller. The derivative te
 ```text
 error = target_altitude_m - altitude_m
 vertical_velocity_mps = delta_altitude_m / delta_time_s
-throttle = hover_throttle + kp * error - kd * vertical_velocity_mps
+integral_error = clamp(integral_error + error * dt, -integral_limit, integral_limit)
+throttle = hover_throttle + kp * error + ki * integral_error - kd * vertical_velocity_mps
 ```
 
 The command is clamped:
@@ -143,9 +144,13 @@ Defaults:
 | Rate | `50 Hz` |
 | Hover throttle | `1600` |
 | `kp` | `100` |
+| `ki` | `0` |
 | `kd` | `90` |
+| Integral limit | `5 m*s` |
 | Min throttle | `1100` |
 | Max throttle | `2000` |
+| Descent duration | `8 s` |
+| Landing altitude | `0.15 m` |
 
 ## Troubleshooting
 

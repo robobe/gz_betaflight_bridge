@@ -136,26 +136,26 @@ AUX2 high = ANGLE
 
 ## Usage
 
-Recommended full-stack MSP hover launch:
+Recommended MSP hover workflow:
 
-```bash
-scripts/run_msp_hover_stack.sh --headless --target-altitude 5
+```text
+Command Palette -> Tasks: Run Task -> Stack: run all
 ```
 
-This starts:
+This VS Code task starts:
 
 1. Gazebo
 2. Betaflight SITL
 3. C++ bridge
-4. Python MSP hover controller
+4. Websockify
 
-Logs are written under:
+Then run the Python hover controller in a separate terminal:
 
-```text
-logs/msp-hover-stack-YYYYMMDD-HHMMSS/
+```bash
+scripts/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
-Stop the complete stack with `Ctrl+C`.
+For detailed PID tuning and descent behavior, see `docs/usage/msp_hover_python.md`.
 
 Bridge-only stack launch:
 
@@ -173,7 +173,7 @@ Manual MSP hover flow:
 
 ```bash
 scripts/run_takeoff_stack.sh
-scripts/hover_msp_controller.py --target-altitude 5
+scripts/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 Manual launch order:
