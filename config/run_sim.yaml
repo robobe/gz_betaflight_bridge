@@ -1,0 +1,18 @@
+session_name: run_sim
+start_directory: ..
+windows:
+  - window_name: stack
+    layout: tiled
+    panes:
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'gazebo'
+          - ./scripts/run_quadcopter_world.sh -r
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'websockify'
+          - uv run websockify 127.0.0.1:6761 127.0.0.1:5761
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'sitl'
+          - ./scripts/run_betaflight_sitl.sh
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'bridge'
+          - ./scripts/run_bridge.sh config/bridge.yaml

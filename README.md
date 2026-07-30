@@ -86,6 +86,56 @@ The task opens four split terminals in one terminal panel group:
 
 ---
 
+## Tip: using tmux and tmuxp to run multiple script
+
+```bash
+sudo apt install tmux tmuxp
+```
+
+```yaml
+session_name: run_sim
+start_directory: ..
+windows:
+  - window_name: stack
+    layout: tiled
+    panes:
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'gazebo'
+          - ./scripts/run_quadcopter_world.sh -r
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'websockify'
+          - uv run websockify 127.0.0.1:6761 127.0.0.1:5761
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'sitl'
+          - ./scripts/run_betaflight_sitl.sh
+      - shell_command:
+          - printf '\033]2;%s\033\\' 'bridge'
+          - ./scripts/run_bridge.sh config/bridge.yaml
+
+```
+
+```
+tmuxp load config/run_sim.yaml
+```
+
+> [!TIP]
+> Copy config/.tmux.conf to home folder
+> ctrl-a ctrl-c exit tmux session
+> using mouse to switch pane focus
+
+---
+## Motor test
+
+```text
+Command Palette -> Tasks: Run Task -> Stack: run all
+```
+
+
+
+![](docs/images/motor_order_check.mp4)
+
+---
+
 ## Usage 
 ### Demo: Msp Hover control
 After the bridge is running and receiving Gazebo sensor data, run the MSP hover controller in another terminal:
