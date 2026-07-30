@@ -132,7 +132,10 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 
 
 
-![](docs/images/motor_order_check.mp4)
+<video src="docs/images/motor_order_check.mp4" controls muted loop playsinline width="100%">
+  Your browser does not support embedded video. Open
+  <a href="docs/images/motor_order_check.mp4">docs/images/motor_order_check.mp4</a>.
+</video>
 
 ---
 
