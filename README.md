@@ -120,3 +120,18 @@ scripts/hover_msp_controller.py \
 | MSP square mission | [docs/msp_square_mission.md](docs/msp_square_mission.md) |
 | Project summary presentation | [docs/project_summary_presentation.md](docs/project_summary_presentation.md) |
 
+---
+
+## Gazebo 
+
+Gazebo's `MulticopterMotorModel` plugin turns rotor speed commands into simulated forces. The bridge publishes `gz.msgs.Actuators` with one rotor velocity per motor, and each motor plugin applies thrust, drag, and yaw torque to the X3 quadcopter model.
+
+The important idea is that Betaflight does not directly move the drone in Gazebo. Betaflight outputs normalized motor values, the bridge converts them to rad/s, and Gazebo uses the motor model parameters to calculate lift:
+
+```text
+thrust_N = motorConstant * rotor_speed_rad_s^2
+```
+
+For stable tuning, keep the bridge `max_rotor_velocity_rad_s` and each Gazebo `<maxRotVelocity>` value matched. Increase those values, or increase `motorConstant`, when the drone needs too much throttle to lift.
+
+[more](docs/gazebo_world_motor_model.md)
