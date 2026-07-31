@@ -60,6 +60,60 @@ The bridge executable is created at:
 build/debug/betaflight_gazebo_bridge
 ```
 
+
+### python venv 
+
+```bash
+# under root project folder
+uv venv
+
+# install
+uv pip install websockify
+```
+
+### Betaflight configure
+
+- set ARM: aux1 
+- set ANGEL: aux2
+
+```
+# 
+
+# diff
+
+# version
+# Betaflight / SITL (SITL) 2026.6.0-alpha Jul 24 2026 / 16:31:24 (81da7c596) MSP API: 1.48
+
+# start the command batch
+batch start
+
+
+# feature
+feature -RX_UDP
+feature -TELEMETRY
+feature RX_MSP
+
+# aux
+aux 0 0 0 1700 2100 0 0
+aux 1 1 1 1700 2100 0 0
+
+profile 0
+
+rateprofile 0
+
+battery_profile 0
+
+# end the command batch
+batch end
+
+# 
+```
+
+![alt text](docs/images/bt_modes.png)
+
+![alt text](docs/images/bt_reciever.png)
+
+
 ---
 
 ## Gazebo world and plugin
@@ -143,6 +197,14 @@ tmuxp load config/run_sim.yaml
 > - ctrl-a ctrl-c exit tmux session  
 > - using mouse to switch pane focus  
 
+
+> [!TIP]
+> Clear gazebo process  
+> ```
+> pkill -9 -f "gz sim"  
+> ```
+
+ 
 ---
 
 ## Motor test
