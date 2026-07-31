@@ -139,9 +139,9 @@ tmuxp load config/run_sim.yaml
 ```
 
 > [!TIP]
-> Copy config/.tmux.conf to home folder  
-> ctrl-a ctrl-c exit tmux session  
-> using mouse to switch pane focus  
+> - Copy config/.tmux.conf to home folder  
+> - ctrl-a ctrl-c exit tmux session  
+> - using mouse to switch pane focus  
 
 ---
 
@@ -153,10 +153,9 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 
 
 
-<video src="docs/images/motor_order_check.mp4" controls muted loop playsinline width="100%">
-  Your browser does not support embedded video. Open
-  <a href="docs/images/motor_order_check.mp4">docs/images/motor_order_check.mp4</a>.
-</video>
+[![Motor order check](docs/images/motor_order_check.gif)](docs/images/motor_order_check.mp4)
+
+[Open the MP4 recording](docs/images/motor_order_check.mp4)
 
 ---
 
