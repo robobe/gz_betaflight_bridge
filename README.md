@@ -62,6 +62,26 @@ build/debug/betaflight_gazebo_bridge
 
 ---
 
+## Gazebo world and plugin
+
+The simulation world is defined in [worlds/quadcopter.sdf](worlds/quadcopter.sdf). It loads Gazebo's physics, sensor, scene, user-command, IMU, and altimeter systems, then includes the local X3 quadcopter model from [models/betaflight_x3/model.sdf](models/betaflight_x3/model.sdf).
+
+Each rotor is connected to Gazebo's `MulticopterMotorModel` system. The bridge publishes rotor velocity commands to:
+
+```text
+/X3/gazebo/command/motor_speed
+```
+
+The four motor plugins read that `gz.msgs.Actuators` message by actuator index and turn each commanded rotor speed into thrust, drag, and reaction torque. Gazebo physics then moves the X3 body, while the IMU and altimeter sensors publish feedback that the bridge sends back to Betaflight.
+
+For tuning, the important motor-model values are `<maxRotVelocity>`, `<motorConstant>`, `<momentConstant>`, and each rotor's `<turningDirection>`. The bridge's `motors.max_rotor_velocity_rad_s` in [config/bridge.yaml](config/bridge.yaml) should match Gazebo's `<maxRotVelocity>` values.
+
+
+![alt text](docs/images/gazebo.png)
+[read more ](docs/gazebo_world_motor_model.md)
+
+---
+
 ## Run The Stack
 
 Then start 
@@ -88,11 +108,11 @@ The task opens four split terminals in one terminal panel group:
 
 ## Tip: using tmux and tmuxp to run multiple script
 
-```bash
+```bash title="install"
 sudo apt install tmux tmuxp
 ```
 
-```yaml
+```yaml title="tmuxp script"
 session_name: run_sim
 start_directory: ..
 windows:
@@ -114,16 +134,17 @@ windows:
 
 ```
 
-```
+```bash title="tmux run script"
 tmuxp load config/run_sim.yaml
 ```
 
 > [!TIP]
-> Copy config/.tmux.conf to home folder
-> ctrl-a ctrl-c exit tmux session
-> using mouse to switch pane focus
+> Copy config/.tmux.conf to home folder  
+> ctrl-a ctrl-c exit tmux session  
+> using mouse to switch pane focus  
 
 ---
+
 ## Motor test
 
 ```text
