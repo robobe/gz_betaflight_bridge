@@ -38,6 +38,22 @@
       ]
     },
     {
+      "label": "Betaflight: build latest stable SITL",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/build_betaflight_sitl.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
       "label": "Run betaflight_gazebo_bridge",
       "type": "shell",
       "command": "${workspaceFolder}/build/debug/betaflight_gazebo_bridge",
@@ -133,6 +149,35 @@
         "Stack: websockify"
       ],
       "dependsOrder": "parallel",
+      "problemMatcher": []
+    },
+    {
+      "label": "Stack: run tmuxp",
+      "type": "shell",
+      "command": "tmuxp",
+      "args": [
+        "load",
+        "${workspaceFolder}/config/run_sim.yaml"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Test: Betaflight ALT HOLD",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/scripts/run_althold_test.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     }
   ]

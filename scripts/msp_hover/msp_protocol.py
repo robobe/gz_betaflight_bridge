@@ -4,7 +4,9 @@ from dataclasses import dataclass
 
 
 MSP_API_VERSION = 1
+MSP_STATUS = 101
 MSP_ALTITUDE = 109
+MSP_BOXIDS = 119
 MSP_SET_RAW_RC = 200
 
 REQUEST_HEADER = b"$M<"
@@ -71,4 +73,3 @@ def try_parse_response(buffer: bytearray) -> MspResponse | None:
         )
 
     return MspResponse(command=command, payload=payload, is_error=(header == ERROR_HEADER))
-
