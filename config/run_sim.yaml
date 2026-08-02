@@ -3,6 +3,7 @@ start_directory: ..
 windows:
   - window_name: stack
     layout: tiled
+    suppress_history: false
     panes:
       - shell_command:
           - printf '\033]2;%s\033\\' 'gazebo'
