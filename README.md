@@ -131,6 +131,27 @@ batch end
 
 The simulation world is defined in [worlds/quadcopter.sdf](worlds/quadcopter.sdf). It loads Gazebo's physics, sensor, scene, user-command, IMU, and altimeter systems, then includes the local X3 quadcopter model from [models/betaflight_x3/model.sdf](models/betaflight_x3/model.sdf).
 
+An additive camera-enabled world is available at
+[worlds/quadcopter_sensor.sdf](worlds/quadcopter_sensor.sdf). It includes the
+`model://betaflight_x3_sensor` wrapper, which keeps the original X3 links and
+motor configuration and adds a fixed forward camera. The original world and
+launcher remain unchanged.
+
+Run the sensor world directly:
+
+```bash
+scripts/run_quadcopter_sensor_world.sh -r
+```
+
+The camera publishes 640x480 RGB images at 30 Hz on:
+
+```text
+/X3/front_camera/image
+```
+
+The sensor world opens a docked `Front Camera` Image Display widget already
+bound to that topic.
+
 Each rotor is connected to Gazebo's `MulticopterMotorModel` system. The bridge publishes rotor velocity commands to:
 
 ```text
@@ -164,6 +185,7 @@ The task opens four split terminals in one terminal panel group:
 | Task | Starts |
 |---|---|
 | `Stack: gazebo` | `scripts/run_quadcopter_world.sh -r` |
+| `Stack: gazebo sensor` | `scripts/run_quadcopter_sensor_world.sh -r` |
 | `Stack: sitl` | `scripts/run_betaflight_sitl.sh` |
 | `Stack: bridge` | `scripts/run_bridge.sh config/bridge.yaml` |
 | `Stack: websockify` | `uv run websockify 127.0.0.1:6761 127.0.0.1:5761` |

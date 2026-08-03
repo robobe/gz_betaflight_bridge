@@ -12,6 +12,19 @@ The world includes the local model:
 models/betaflight_x3/model.sdf
 ```
 
+The optional sensor-enabled composition is split into:
+
+```text
+models/betaflight_x3_sensor/model.sdf
+worlds/quadcopter_sensor.sdf
+```
+
+The sensor model merges the original X3 model, owns the same four motor
+plugins, and adds a fixed forward camera on `/X3/front_camera/image`. The
+original `worlds/quadcopter.sdf` remains available without the camera wrapper.
+The sensor world's GUI opens a docked `Front Camera` Image Display widget for
+that topic automatically.
+
 The bridge does not calculate thrust. Its job is only:
 
 ```text

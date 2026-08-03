@@ -87,6 +87,23 @@
       "problemMatcher": []
     },
     {
+      "label": "Stack: gazebo sensor",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run_quadcopter_sensor_world.sh",
+      "args": [
+        "-r"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "group": "betaflight-stack-sensor",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Stack: sitl",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/run_betaflight_sitl.sh",
@@ -144,6 +161,17 @@
       "label": "Stack: run all",
       "dependsOn": [
         "Stack: gazebo",
+        "Stack: sitl",
+        "Stack: bridge",
+        "Stack: websockify"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    },
+    {
+      "label": "Stack: run all sensor",
+      "dependsOn": [
+        "Stack: gazebo sensor",
         "Stack: sitl",
         "Stack: bridge",
         "Stack: websockify"
