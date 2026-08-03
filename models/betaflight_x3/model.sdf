@@ -28,7 +28,7 @@
                 <geometry>
                     <mesh>
                         <scale>1 1 1</scale>
-                        <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/x3 uav/4/files/meshes/x3.dae</uri>
+                        <uri>model://betaflight_x3/meshes/x3.dae</uri>
                     </mesh>
                 </geometry>
             </visual>
@@ -79,7 +79,7 @@
                 <geometry>
                     <mesh>
                         <scale>0.1 0.1 0.1</scale>
-                        <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/x3 uav/4/files/meshes/propeller_ccw.dae</uri>
+                        <uri>model://betaflight_x3/meshes/propeller_ccw.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -144,7 +144,7 @@
                 <geometry>
                     <mesh>
                         <scale>0.1 0.1 0.1</scale>
-                        <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/x3 uav/4/files/meshes/propeller_ccw.dae</uri>
+                        <uri>model://betaflight_x3/meshes/propeller_ccw.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -209,7 +209,7 @@
                 <geometry>
                     <mesh>
                         <scale>0.1 0.1 0.1</scale>
-                        <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/x3 uav/4/files/meshes/propeller_cw.dae</uri>
+                        <uri>model://betaflight_x3/meshes/propeller_cw.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
@@ -274,7 +274,7 @@
                 <geometry>
                     <mesh>
                         <scale>0.1 0.1 0.1</scale>
-                        <uri>https://fuel.gazebosim.org/1.0/openrobotics/models/x3 uav/4/files/meshes/propeller_cw.dae</uri>
+                        <uri>model://betaflight_x3/meshes/propeller_cw.dae</uri>
                     </mesh>
                 </geometry>
                 <material>
