@@ -9,60 +9,109 @@ OUTPUT_DIR="${PROJECT_ROOT}/bin"
 OUTPUT_BINARY="${OUTPUT_DIR}/betaflight_SITL.elf"
 BUILD_JOBS="${BUILD_JOBS:-$(nproc)}"
 
+log() {
+  local level="$1"
+  shift
+  printf '[%s] [%-5s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "${level}" "$*"
+}
+
+log_info() {
+  log "INFO" "$@"
+}
+
+log_warn() {
+  log "WARN" "$@" >&2
+}
+
+log_error() {
+  log "ERROR" "$@" >&2
+}
+
+BUILD_START_SECONDS="${SECONDS}"
+trap 'log_error "Build failed at line ${LINENO}."' ERR
+
 for command in git make curl tar; do
   if ! command -v "${command}" >/dev/null 2>&1; then
-    echo "Required command not found: ${command}" >&2
+    log_error "Required command not found: ${command}"
     exit 1
   fi
 done
 
-echo "Finding the latest stable Betaflight release..."
-LATEST_STABLE_TAG="$({
+log_info "Finding the three newest stable Betaflight releases..."
+mapfile -t STABLE_TAGS < <({
   git ls-remote --tags --refs "${BETAFLIGHT_REPOSITORY}" \
     | awk -F/ '{print $3}' \
     | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
     | sort -V \
-    | tail -n 1
-} || true)"
+    | tail -n 3 \
+    | sort -Vr
+} || true)
 
-if [[ -z "${LATEST_STABLE_TAG}" ]]; then
-  echo "Could not determine the latest stable Betaflight release." >&2
+if ((${#STABLE_TAGS[@]} < 3)); then
+  log_error "Expected at least three stable Betaflight releases, found ${#STABLE_TAGS[@]}."
   exit 1
 fi
 
-echo "Latest stable release: ${LATEST_STABLE_TAG}"
+log_info "Available stable releases (alpha, beta, and RC tags excluded):"
+for index in "${!STABLE_TAGS[@]}"; do
+  printf '  %d) %s\n' "$((index + 1))" "${STABLE_TAGS[${index}]}"
+done
+
+while true; do
+  printf 'Select the Betaflight version to build [1-3]: '
+  if ! read -r selection; then
+    log_error "No version selected because input was closed."
+    exit 1
+  fi
+
+  case "${selection}" in
+    1|2|3)
+      SELECTED_TAG="${STABLE_TAGS[$((selection - 1))]}"
+      break
+      ;;
+    *)
+      log_warn "Invalid selection '${selection}'. Enter 1, 2, or 3."
+      ;;
+  esac
+done
+
+log_info "Selected Betaflight release: ${SELECTED_TAG}"
 
 if [[ -d "${SOURCE_DIR}/.git" ]]; then
   if [[ -n "$(git -C "${SOURCE_DIR}" status --porcelain)" ]]; then
-    echo "Refusing to update modified source tree: ${SOURCE_DIR}" >&2
+    log_error "Refusing to update modified source tree: ${SOURCE_DIR}"
     exit 1
   fi
-  git -C "${SOURCE_DIR}" fetch --depth 1 origin "refs/tags/${LATEST_STABLE_TAG}:refs/tags/${LATEST_STABLE_TAG}"
-  git -C "${SOURCE_DIR}" checkout --detach "${LATEST_STABLE_TAG}"
+  log_info "Fetching ${SELECTED_TAG} into the existing source tree."
+  git -C "${SOURCE_DIR}" fetch --depth 1 origin "refs/tags/${SELECTED_TAG}:refs/tags/${SELECTED_TAG}"
+  git -C "${SOURCE_DIR}" checkout --detach "${SELECTED_TAG}"
 elif [[ -e "${SOURCE_DIR}" ]]; then
-  echo "Source path exists but is not a Git repository: ${SOURCE_DIR}" >&2
+  log_error "Source path exists but is not a Git repository: ${SOURCE_DIR}"
   exit 1
 else
+  log_info "Cloning Betaflight ${SELECTED_TAG} into ${SOURCE_DIR}."
   mkdir -p "$(dirname -- "${SOURCE_DIR}")"
-  git clone --branch "${LATEST_STABLE_TAG}" --depth 1 \
+  git clone --branch "${SELECTED_TAG}" --depth 1 \
     "${BETAFLIGHT_REPOSITORY}" "${SOURCE_DIR}"
 fi
 
 # Betaflight validates its pinned ARM toolchain before selecting the native
 # compiler used by SITL. This target is idempotent after the first installation.
-echo "Ensuring Betaflight's pinned build toolchain is installed..."
+log_info "Ensuring Betaflight's pinned build toolchain is installed."
 make -C "${SOURCE_DIR}" arm_sdk_install
 
-echo "Building Betaflight ${LATEST_STABLE_TAG} for SITL..."
+log_info "Building Betaflight ${SELECTED_TAG} for SITL with ${BUILD_JOBS} jobs."
 make -C "${SOURCE_DIR}" TARGET=SITL -j"${BUILD_JOBS}"
 
 BUILT_BINARY="${SOURCE_DIR}/obj/main/betaflight_SITL.elf"
 if [[ ! -x "${BUILT_BINARY}" ]]; then
-  echo "Build completed without the expected binary: ${BUILT_BINARY}" >&2
+  log_error "Build completed without the expected binary: ${BUILT_BINARY}"
   exit 1
 fi
 
 mkdir -p "${OUTPUT_DIR}"
 install -m 0755 "${BUILT_BINARY}" "${OUTPUT_BINARY}"
 
-echo "Betaflight SITL binary: ${OUTPUT_BINARY}"
+trap - ERR
+log_info "Betaflight SITL binary: ${OUTPUT_BINARY}"
+log_info "Build completed successfully in $((SECONDS - BUILD_START_SECONDS)) seconds."
