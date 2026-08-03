@@ -60,6 +60,17 @@ The bridge executable is created at:
 build/debug/betaflight_gazebo_bridge
 ```
 
+Build Betaflight SITL with:
+
+```bash
+scripts/build_betaflight_sitl.sh
+```
+
+The script lists the three newest stable `X.Y.Z` tags, excluding alpha, beta,
+and release-candidate tags. Select a version from the numbered menu. The build
+prints timestamped progress messages and installs the selected SITL executable
+at `bin/betaflight_SITL.elf`.
+
 
 ### python venv 
 
@@ -270,3 +281,6 @@ thrust_N = motorConstant * rotor_speed_rad_s^2
 For stable tuning, keep the bridge `max_rotor_velocity_rad_s` and each Gazebo `<maxRotVelocity>` value matched. Increase those values, or increase `motorConstant`, when the drone needs too much throttle to lift.
 
 [more](docs/gazebo_world_motor_model.md)
+
+
+gz topic -t /X3/gazebo/command/motor_speed --msgtype gz.msgs.Actuators -p 'velocity:[100, 0, 0, 0]'

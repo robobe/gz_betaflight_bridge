@@ -27,6 +27,12 @@ int main()
     }
     assert(threw);
 
+    const auto logicalMotors = SitlPacketToBetaflightMotorOrder({20.0, 30.0, 40.0, 10.0});
+    assert(logicalMotors[0] == 10.0);  // M1
+    assert(logicalMotors[1] == 20.0);  // M2
+    assert(logicalMotors[2] == 30.0);  // M3
+    assert(logicalMotors[3] == 40.0);  // M4
+
     MotorMapper mapper({1, 0, 3, 2});
     const auto mapped = mapper.Apply({10.0, 20.0, 30.0, 40.0});
     assert(mapped[0] == 20.0);

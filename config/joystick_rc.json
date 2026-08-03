@@ -15,12 +15,12 @@
   "pitch": {
     "axis": 1,
     "center": 0,
-    "invert": true
+    "invert": false
   },
   "roll": {
     "axis": 0,
     "center": 0,
-    "invert": true
+    "invert": false
   },
   "throttle": {
     "axis": 2,

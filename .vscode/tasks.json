@@ -38,7 +38,7 @@
       ]
     },
     {
-      "label": "Betaflight: build latest stable SITL",
+      "label": "Betaflight: select and build stable SITL",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/build_betaflight_sitl.sh",
       "options": {
