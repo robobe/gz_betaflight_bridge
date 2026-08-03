@@ -5,6 +5,8 @@
 namespace betaflight_gazebo_bridge
 {
 
+std::array<double, 4> SitlPacketToBetaflightMotorOrder(const std::array<double, 4> &packetMotors);
+
 class MotorMapper
 {
 public:
@@ -27,4 +29,3 @@ private:
 };
 
 }  // namespace betaflight_gazebo_bridge
-

@@ -77,11 +77,11 @@ void BridgeApp::ReceiveMotorPackets()
         ServoPacket packet{};
         std::memcpy(&packet, buffer.data(), sizeof(packet));
 
-        std::array<double, 4> commands{};
+        std::array<double, 4> packetCommands{};
         bool valid = true;
-        for (std::size_t i = 0; i < commands.size(); ++i) {
-            commands[i] = packet.motorSpeed[i];
-            if (!std::isfinite(commands[i])) {
+        for (std::size_t i = 0; i < packetCommands.size(); ++i) {
+            packetCommands[i] = packet.motorSpeed[i];
+            if (!std::isfinite(packetCommands[i])) {
                 valid = false;
                 break;
             }
@@ -91,6 +91,7 @@ void BridgeApp::ReceiveMotorPackets()
             continue;
         }
 
+        const auto commands = SitlPacketToBetaflightMotorOrder(packetCommands);
         lastMotorCommand_ = commands;
         lastMotorPacketTime_ = std::chrono::steady_clock::now();
         hasMotorPacket_ = true;
@@ -165,4 +166,3 @@ std::array<double, 4> BridgeApp::ZeroMotors() const
 }
 
 }  // namespace betaflight_gazebo_bridge
-

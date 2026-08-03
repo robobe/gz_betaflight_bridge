@@ -7,6 +7,15 @@
 namespace betaflight_gazebo_bridge
 {
 
+std::array<double, 4> SitlPacketToBetaflightMotorOrder(const std::array<double, 4> &packetMotors)
+{
+    // Betaflight SITL's Gazebo UDP output is deliberately serialized as
+    // [M2, M3, M4, M1], not the flight controller's logical [M1, M2, M3, M4]
+    // order. Normalize it here so motors.map consistently refers to logical
+    // zero-based Betaflight motor indices.
+    return {packetMotors[3], packetMotors[0], packetMotors[1], packetMotors[2]};
+}
+
 MotorMapper::MotorMapper(std::array<int, 4> map)
     : map_(map)
 {
@@ -40,4 +49,3 @@ double MotorVelocityConverter::Convert(const double normalizedCommand) const
 }
 
 }  // namespace betaflight_gazebo_bridge
-
