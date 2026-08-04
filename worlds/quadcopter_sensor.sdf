@@ -135,6 +135,13 @@
         <topic_picker>false</topic_picker>
       </plugin>
 
+      <plugin filename="VisualizeLidar" name="Down Lidar Scan">
+        <gz-gui>
+          <title>Down Lidar Scan</title>
+          <property key="state" type="string">docked</property>
+        </gz-gui>
+      </plugin>
+
       <plugin filename="ComponentInspector" name="Component inspector">
         <gz-gui>
           <property type="string" key="state">docked_collapsed</property>

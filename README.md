@@ -143,6 +143,13 @@ Run the sensor world directly:
 scripts/run_quadcopter_sensor_world.sh -r
 ```
 
+Run the navigation practice world with trees, a house, flight gate, tower,
+and five marked points of interest:
+
+```bash
+scripts/run_quadcopter_navigation_world.sh -r
+```
+
 The camera publishes 640x480 RGB images at 30 Hz on:
 
 ```text
@@ -151,6 +158,15 @@ The camera publishes 640x480 RGB images at 30 Hz on:
 
 The sensor world opens a docked `Front Camera` Image Display widget already
 bound to that topic.
+
+The wrapper also publishes two single-beam rangefinders at 20 Hz:
+
+```text
+/X3/front_range/scan  # forward, aligned with the camera
+/X3/down_range/scan   # fixed downward, toward the ground
+```
+
+Both topics use `gz.msgs.LaserScan` and contain one value in `ranges`.
 
 Each rotor is connected to Gazebo's `MulticopterMotorModel` system. The bridge publishes rotor velocity commands to:
 

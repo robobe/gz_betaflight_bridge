@@ -25,6 +25,11 @@ original `worlds/quadcopter.sdf` remains available without the camera wrapper.
 The sensor world's GUI opens a docked `Front Camera` Image Display widget for
 that topic automatically.
 
+Two one-beam GPU lidar sensors are included in the wrapper. The forward sensor
+is aligned with the camera and publishes `/X3/front_range/scan`; the fixed
+downward sensor publishes `/X3/down_range/scan`. Both publish one
+`gz.msgs.LaserScan.ranges` value at 20 Hz.
+
 The bridge does not calculate thrust. Its job is only:
 
 ```text
