@@ -15,6 +15,7 @@ Start here when navigating the project docs.
 | Motor KV and battery | [motor_kv_battery_mapping.md](motor_kv_battery_mapping.md) | Estimating rotor limits from motor and battery data |
 | Gazebo motor model | [gazebo_world_motor_model.md](gazebo_world_motor_model.md) | World structure and deep tuning of `MulticopterMotorModel` |
 | Coordinate frames | [coordinate_frames.md](coordinate_frames.md) | IMU, quaternion, and frame conversion choices |
+| GPS/FDM design | [design/gps_fdm_2025_12.md](design/gps_fdm_2025_12.md) | Adding Gazebo NavSat GPS for Betaflight 2025.12.x |
 | EEPROM setup | [betaflight_sitl_eeprom.md](betaflight_sitl_eeprom.md) | AUX1 ARM and AUX2 ANGLE setup for SITL |
 | Takeoff test | [takeoff_test.md](takeoff_test.md) | Running and diagnosing the RC takeoff smoke test |
 | Joystick RC | [joystick_rc.md](joystick_rc.md) | Calibrating a joystick and sending RC through MSP or UDP |
@@ -22,6 +23,7 @@ Start here when navigating the project docs.
 | MSP hover controller | [msp_hover_controller.md](msp_hover_controller.md) | Hover using MSP altitude and MSP RC |
 | MSP square mission | [msp_square_mission.md](msp_square_mission.md) | Closed-loop takeoff, square flight, landing, and disarm |
 | MSP hover code design | [msp_hover_code_design.md](msp_hover_code_design.md) | SOLID module design and diagrams |
+| MSP yaw mission design | [design/msp_yaw_mission.md](design/msp_yaw_mission.md) | Synthesized-RC takeoff, 180-degree yaw excursion, landing, and reusable MSP core |
 | Observability | [observability.md](observability.md) | Logs, topics, UDP checks, and troubleshooting signals |
 | Future capabilities | [future_capabilities.md](future_capabilities.md) | Ideas to improve simulation realism |
 | Original implementation plan | [betaflight_gazebo_bridge_plan.md](betaflight_gazebo_bridge_plan.md) | Historical milestone plan and deeper design notes |
