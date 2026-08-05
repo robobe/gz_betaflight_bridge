@@ -57,8 +57,7 @@ python3 scripts/missions/run_msp_yaw_mission.py \
   --throttle-slew-rate 1000 \
   --yaw-max-offset 60 \
   --yaw-min-offset 20 \
-  --yaw-slew-rate 60 \
-  --yaw-throttle-compensation 0.4
+  --yaw-slew-rate 60
 ```
 
 Use `--help` for the complete option list.
@@ -170,10 +169,10 @@ vertical speed exceeds 0.30 m/s, yaw returns to center immediately. Rotation
 resumes with a gradual ramp after the altitude loop recovers. The default yaw
 timeout is 40 seconds to allow for these recovery pauses.
 
-The X3 mixer increases total lift while yaw authority is applied. During yaw,
-the mission therefore subtracts 0.4 throttle units for each RC yaw unit away
-from center. At the default full yaw command (`1560` or `1440`), this is a
-24-unit collective-throttle reduction. The altitude PID remains active.
+The altitude PID has exclusive ownership of throttle during yaw. Yaw control
+never adds to or subtracts from the PID throttle command. If yaw disturbs the
+vehicle beyond the altitude gate, yaw returns to center and the PID recovers
+altitude before rotation resumes.
 
 If the vehicle's RC yaw polarity is reversed, add `--reverse-yaw`. Direction
 verification still uses attitude feedback and aborts if the selected polarity

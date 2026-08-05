@@ -268,10 +268,6 @@ class MissionSafetyTest(unittest.TestCase):
 
         self.assertEqual(self.mission._altitude_guarded_yaw(1560, -0.16, 0.10, 0.04), 1500)
 
-    def test_yaw_collective_compensation_scales_with_stick_offset(self) -> None:
-        self.assertEqual(self.mission._yaw_compensated_throttle(1660, 1560), 1636)
-        self.assertEqual(self.mission._yaw_compensated_throttle(1660, 1500), 1660)
-
     def test_wrong_direction_is_rejected(self) -> None:
         with self.assertRaisesRegex(MissionFailure, "wrong direction"):
             self.mission._check_direction(Phase.YAW_CW, 0.0, 1.0, -3.0)

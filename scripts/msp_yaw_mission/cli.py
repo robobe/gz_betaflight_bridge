@@ -38,7 +38,6 @@ def parse_args(argv: list[str] | None = None) -> AppConfig:
     parser.add_argument("--yaw-max-offset", type=int, default=60)
     parser.add_argument("--yaw-min-offset", type=int, default=20)
     parser.add_argument("--yaw-slew-rate", type=float, default=60.0)
-    parser.add_argument("--yaw-throttle-compensation", type=float, default=0.4)
     parser.add_argument(
         "--reverse-yaw",
         action="store_true",
@@ -68,7 +67,6 @@ def parse_args(argv: list[str] | None = None) -> AppConfig:
         yaw_max_offset_pwm=args.yaw_max_offset,
         yaw_min_offset_pwm=args.yaw_min_offset,
         yaw_slew_rate_pwm_s=args.yaw_slew_rate,
-        yaw_throttle_compensation=args.yaw_throttle_compensation,
         yaw_clockwise_pwm_sign=-1 if args.reverse_yaw else 1,
         yaw_timeout_s=args.yaw_timeout,
         takeoff_timeout_s=args.takeoff_timeout,

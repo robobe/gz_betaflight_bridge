@@ -37,13 +37,13 @@ class Phase(str, Enum):
 
 @dataclass(frozen=True)
 class MissionConfig:
-    rate_hz: float = 25.0
+    rate_hz: float = 50.0
     target_height_m: float = 3.0
     descent_rate_mps: float = 1.0
     hover_throttle: int = 1660
     altitude_kp: float = 20.0
-    altitude_ki: float = 10.0
-    altitude_kd: float = 30.0
+    altitude_ki: float = 0.0
+    altitude_kd: float = 5.0
     integral_limit_m_s: float = 8.0
     min_throttle: int = 1300
     max_throttle: int = 1850
@@ -67,7 +67,6 @@ class MissionConfig:
     yaw_slew_rate_pwm_s: float = 60.0
     yaw_altitude_gate_error_m: float = 0.15
     yaw_altitude_gate_speed_mps: float = 0.30
-    yaw_throttle_compensation: float = 0.4
     yaw_clockwise_pwm_sign: int = 1
     direction_check_after_s: float = 1.0
     direction_min_progress_deg: float = 2.0
@@ -104,8 +103,6 @@ class MissionConfig:
             raise ValueError("yaw PWM offsets must be positive, ordered, and remain within the RC range")
         if self.yaw_slew_rate_pwm_s <= 0.0:
             raise ValueError("yaw_slew_rate_pwm_s must be positive")
-        if self.yaw_throttle_compensation < 0.0:
-            raise ValueError("yaw_throttle_compensation must not be negative")
         if self.yaw_clockwise_pwm_sign not in (-1, 1):
             raise ValueError("yaw_clockwise_pwm_sign must be -1 or +1")
 
@@ -324,7 +321,6 @@ class YawMission:
                     yaw_pwm = self._altitude_guarded_yaw(
                         desired_yaw_pwm, altitude_error_m, vertical_velocity_mps, altitude_dt_s
                     )
-                    throttle = self._yaw_compensated_throttle(throttle, yaw_pwm)
                     self._check_direction(phase, phase_started_s, now_s, heading_deg - yaw_start_heading_deg)
                     dwell_started_s = self._yaw_dwell(dwell_started_s, now_s, yaw_target_deg, heading_deg)
                     if dwell_started_s is not None and now_s - dwell_started_s >= self._config.yaw_settle_s:
@@ -350,7 +346,6 @@ class YawMission:
                     yaw_pwm = self._altitude_guarded_yaw(
                         desired_yaw_pwm, altitude_error_m, vertical_velocity_mps, altitude_dt_s
                     )
-                    throttle = self._yaw_compensated_throttle(throttle, yaw_pwm)
                     self._check_direction(phase, phase_started_s, now_s, yaw_start_heading_deg - heading_deg)
                     dwell_started_s = self._yaw_dwell(dwell_started_s, now_s, yaw_target_deg, heading_deg)
                     if dwell_started_s is not None and now_s - dwell_started_s >= self._config.yaw_settle_s:
@@ -514,10 +509,6 @@ class YawMission:
             return 1500
         limiter_dt_s = dt_s if dt_s > 0.0 else 1.0 / self._config.rate_hz
         return self._yaw_limiter.command(desired_yaw_pwm, limiter_dt_s)
-
-    def _yaw_compensated_throttle(self, throttle_pwm: int, yaw_pwm: int) -> int:
-        compensation = self._config.yaw_throttle_compensation * abs(yaw_pwm - 1500)
-        return int(round(max(self._config.min_throttle, throttle_pwm - compensation)))
 
     def _yaw_dwell(self, started_s: float | None, now_s: float, target_deg: float, heading_deg: float) -> float | None:
         return self._condition_dwell(

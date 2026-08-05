@@ -226,5 +226,11 @@
       <uri>model://betaflight_x3_sensor</uri>
       <name>X3</name>
     </include>
+
+    <include>
+      <uri>model://red_box</uri>
+      <name>box</name>
+      <pose>5 10 0.5 0 0 0</pose>
+    </include>
   </world>
 </sdf>
