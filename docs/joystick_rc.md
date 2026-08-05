@@ -6,8 +6,8 @@ Two send paths are available:
 
 | Script | Betaflight receiver mode | Use case |
 |---|---|---|
-| `scripts/joystick_rc_msp.py` | `RX_MSP` | Current MSP workflow, same profile used by MSP hover |
-| `scripts/joystick_rc_udp.py` | `RX_UDP` | Legacy UDP RC smoke tests on port `9004` |
+| `scripts/tools/joystick_rc_msp.py` | `RX_MSP` | Current MSP workflow, same profile used by MSP hover |
+| `scripts/tools/joystick_rc_udp.py` | `RX_UDP` | Legacy UDP RC smoke tests on port `9004` |
 
 Both scripts share the same mapping file:
 
@@ -22,7 +22,7 @@ The MSP joystick script sends RC with `MSP_SET_RAW_RC` to Betaflight MSP TCP, de
 Use the MSP EEPROM profile:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 Start Gazebo, SITL, the bridge, and websockify with VS Code:
@@ -34,14 +34,14 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 Then run:
 
 ```bash
-scripts/joystick_rc_msp.py run --device /dev/input/js0
+scripts/tools/joystick_rc_msp.py run --device /dev/input/js0
 ```
 
 Useful MSP options:
 
 ```bash
-scripts/joystick_rc_msp.py run --device /dev/input/js0 --host 127.0.0.1 --port 5761 --rate 50
-scripts/joystick_rc_msp.py run --device /dev/input/js0 --config config/my_joystick.json
+scripts/tools/joystick_rc_msp.py run --device /dev/input/js0 --host 127.0.0.1 --port 5761 --rate 50
+scripts/tools/joystick_rc_msp.py run --device /dev/input/js0 --config config/my_joystick.json
 ```
 
 The script prints live RC state:
@@ -56,7 +56,7 @@ Keep throttle low before enabling ARM. On exit, the script sends a short disarm 
 
 The UDP joystick tool sends Betaflight SITL RC packets to UDP port `9004`.
 
-It uses the same UDP packet format as `scripts/send_rc_test.py`:
+It uses the same UDP packet format as `scripts/tests/send_rc_test.py`:
 
 ```text
 double timestamp_seconds
@@ -79,7 +79,7 @@ Channel mapping:
 Run calibration once:
 
 ```bash
-scripts/joystick_rc_msp.py calibrate --device /dev/input/js0
+scripts/tools/joystick_rc_msp.py calibrate --device /dev/input/js0
 ```
 
 The script asks you to:
@@ -105,7 +105,7 @@ config/joystick_rc.json
 You can also calibrate through the UDP wrapper. It writes the same config format:
 
 ```bash
-scripts/joystick_rc_udp.py calibrate --device /dev/input/js0
+scripts/tools/joystick_rc_udp.py calibrate --device /dev/input/js0
 ```
 
 ## Run UDP
@@ -115,19 +115,19 @@ The joystick sends legacy UDP RC, so Betaflight must use `RX_UDP`.
 Stop the stack, then generate the UDP EEPROM profile once:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_udp_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_udp_modes.cli
 ```
 
 Start Gazebo, SITL, and the bridge:
 
 ```bash
-scripts/run_takeoff_stack.sh
+scripts/run/run_takeoff_stack.sh
 ```
 
 Then run UDP RC:
 
 ```bash
-scripts/joystick_rc_udp.py run --device /dev/input/js0
+scripts/tools/joystick_rc_udp.py run --device /dev/input/js0
 ```
 
 The default output is:
@@ -193,9 +193,9 @@ If one axis is reversed, edit its `invert` value in `config/joystick_rc.json` an
 ## Useful UDP options
 
 ```bash
-scripts/joystick_rc_udp.py run --device /dev/input/js0 --ip 127.0.0.1 --port 9004 --rate 50
-scripts/joystick_rc_udp.py calibrate --device /dev/input/js0 --config config/my_joystick.json
-scripts/joystick_rc_udp.py run --device /dev/input/js0 --config config/my_joystick.json
+scripts/tools/joystick_rc_udp.py run --device /dev/input/js0 --ip 127.0.0.1 --port 9004 --rate 50
+scripts/tools/joystick_rc_udp.py calibrate --device /dev/input/js0 --config config/my_joystick.json
+scripts/tools/joystick_rc_udp.py run --device /dev/input/js0 --config config/my_joystick.json
 ```
 
 ## Troubleshooting
@@ -231,5 +231,5 @@ Make sure SITL is running and listening on MSP TCP `5761`, and that the MSP EEPR
 If you later use the MSP hover, MSP joystick, or square controllers again, switch back to the MSP EEPROM profile:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```

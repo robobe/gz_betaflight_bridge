@@ -38,7 +38,7 @@ save
 `RX_MSP` is required for scripts that send RC with `MSP_SET_RAW_RC`, such as:
 
 ```text
-scripts/hover_msp_controller.py
+scripts/missions/hover_msp_controller.py
 ```
 
 CLI field meaning:
@@ -85,7 +85,7 @@ pkill -f betaflight_SITL
 Then load the CLI file:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 SITL loads the commands, saves `eeprom.bin`, and exits.
@@ -93,7 +93,7 @@ SITL loads the commands, saves `eeprom.bin`, and exits.
 Start SITL normally after that:
 
 ```bash
-scripts/run_betaflight_sitl.sh
+scripts/run/run_betaflight_sitl.sh
 ```
 
 ## Send RC
@@ -101,7 +101,7 @@ scripts/run_betaflight_sitl.sh
 The legacy UDP RC script only works when `RX_UDP` is enabled. The current profile enables `RX_MSP`, so use the MSP hover controller for RC control.
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5
+scripts/missions/hover_msp_controller.py --target-altitude 5
 ```
 
 To return to UDP RC smoke tests, change the features back to:

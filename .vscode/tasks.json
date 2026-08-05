@@ -40,7 +40,7 @@
     {
       "label": "Betaflight: select and build stable SITL",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/build_betaflight_sitl.sh",
+      "command": "${workspaceFolder}/scripts/builders/build_betaflight_sitl.sh",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -72,7 +72,7 @@
     {
       "label": "Stack: gazebo",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/run_quadcopter_world.sh",
+      "command": "${workspaceFolder}/scripts/worlds/run_quadcopter_world.sh",
       "args": [
         "-r"
       ],
@@ -89,7 +89,7 @@
     {
       "label": "Stack: gazebo sensor",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/run_quadcopter_sensor_world.sh",
+      "command": "${workspaceFolder}/scripts/worlds/run_quadcopter_sensor_world.sh",
       "args": [
         "-r"
       ],
@@ -106,7 +106,7 @@
     {
       "label": "Stack: sitl",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/run_betaflight_sitl.sh",
+      "command": "${workspaceFolder}/scripts/run/run_betaflight_sitl.sh",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -120,7 +120,7 @@
     {
       "label": "Stack: bridge",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/run_bridge.sh",
+      "command": "${workspaceFolder}/scripts/run/run_bridge.sh",
       "args": [
         "${workspaceFolder}/config/bridge.yaml"
       ],
@@ -197,7 +197,7 @@
       "type": "shell",
       "command": "python3",
       "args": [
-        "${workspaceFolder}/scripts/run_althold_test.py"
+        "${workspaceFolder}/scripts/tests/run_althold_test.py"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

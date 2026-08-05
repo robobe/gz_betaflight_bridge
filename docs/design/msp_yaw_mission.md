@@ -30,7 +30,7 @@ must map AUX1 to ARM and AUX2 to ANGLE as described in
 From the repository root, run:
 
 ```bash
-python3 scripts/run_msp_yaw_mission.py
+python3 scripts/missions/run_msp_yaw_mission.py
 ```
 
 The equivalent module entry point is:
@@ -42,7 +42,7 @@ PYTHONPATH=scripts python3 -m msp_yaw_mission
 Useful tuning options include:
 
 ```bash
-python3 scripts/run_msp_yaw_mission.py \
+python3 scripts/missions/run_msp_yaw_mission.py \
   --target-height 3 \
   --takeoff-step 0.5 \
   --step-dwell 0.75 \
@@ -68,7 +68,7 @@ output is an interactive terminal. Set the standard `NO_COLOR` environment
 variable to disable them:
 
 ```bash
-NO_COLOR=1 python3 scripts/run_msp_yaw_mission.py
+NO_COLOR=1 python3 scripts/missions/run_msp_yaw_mission.py
 ```
 
 ## MSP messages

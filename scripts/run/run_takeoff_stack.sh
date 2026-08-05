@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
 CONFIG_FILE="${PROJECT_ROOT}/config/bridge.yaml"
 LOG_DIR="${PROJECT_ROOT}/logs/takeoff-stack-$(date +%Y%m%d-%H%M%S)"
 HEADLESS=false
@@ -11,7 +11,7 @@ RC_ARGS=(--takeoff-sequence)
 
 usage() {
   cat <<EOF
-Usage: scripts/run_takeoff_stack.sh [options] [-- rc-args...]
+Usage: scripts/run/run_takeoff_stack.sh [options] [-- rc-args...]
 
 Starts Gazebo, Betaflight SITL, and the bridge.
 
@@ -25,10 +25,10 @@ Options:
   -h, --help         Show this help.
 
 Examples:
-  scripts/run_takeoff_stack.sh
-  scripts/run_takeoff_stack.sh --headless
-  scripts/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
-  scripts/run_takeoff_stack.sh -- --takeoff-sequence --ramp-end 1700
+  scripts/run/run_takeoff_stack.sh
+  scripts/run/run_takeoff_stack.sh --headless
+  scripts/run/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
+  scripts/run/run_takeoff_stack.sh -- --takeoff-sequence --ramp-end 1700
 EOF
 }
 
@@ -75,7 +75,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 mkdir -p "${LOG_DIR}"
-source "${SCRIPT_DIR}/setup_gazebo_env.sh" >/dev/null
+source "${PROJECT_ROOT}/scripts/worlds/setup_gazebo_env.sh" >/dev/null
 
 PIDS=()
 NAMES=()
@@ -182,7 +182,7 @@ fi
 
 if [[ ! -f "${PROJECT_ROOT}/eeprom.bin" ]]; then
   echo "Warning: eeprom.bin not found. Generate it once with:" >&2
-  echo "  scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli" >&2
+  echo "  scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli" >&2
 fi
 
 GAZEBO_ARGS=(-r)
@@ -191,26 +191,26 @@ if [[ "${HEADLESS}" == true ]]; then
 fi
 
 start_process "gazebo" "${LOG_DIR}/gazebo.log" \
-  "${SCRIPT_DIR}/run_quadcopter_world.sh" "${GAZEBO_ARGS[@]}"
+  "${PROJECT_ROOT}/scripts/worlds/run_quadcopter_world.sh" "${GAZEBO_ARGS[@]}"
 wait_for_topic "/imu" 30
 wait_for_topic "/altimeter" 30
 wait_for_topic "/X3/gazebo/command/motor_speed" 30
 check_alive
 
 start_process "sitl" "${LOG_DIR}/sitl.log" \
-  "${SCRIPT_DIR}/run_betaflight_sitl.sh"
+  "${PROJECT_ROOT}/scripts/run/run_betaflight_sitl.sh"
 wait_for_udp_port 9003 15
 wait_for_udp_port 9004 15
 check_alive
 
 start_process "bridge" "${LOG_DIR}/bridge.log" \
-  "${SCRIPT_DIR}/run_bridge.sh" "${CONFIG_FILE}"
+  "${PROJECT_ROOT}/scripts/run/run_bridge.sh" "${CONFIG_FILE}"
 sleep 3
 check_alive
 
 if [[ "${START_RC}" == true ]]; then
   start_process "rc" "${LOG_DIR}/rc.log" \
-    "${SCRIPT_DIR}/send_rc_test.py" "${RC_ARGS[@]}"
+    "${PROJECT_ROOT}/scripts/tests/send_rc_test.py" "${RC_ARGS[@]}"
 fi
 
 echo
@@ -224,7 +224,7 @@ else
 fi
 echo
 echo "Run MSP hover in another terminal with:"
-echo "  scripts/hover_msp_controller.py --target-altitude 5"
+echo "  scripts/missions/hover_msp_controller.py --target-altitude 5"
 echo
 echo "Press Ctrl+C here to stop Gazebo, SITL, bridge, and optional RC."
 

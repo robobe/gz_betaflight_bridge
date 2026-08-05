@@ -36,7 +36,7 @@ sequenceDiagram
 Regenerate Betaflight EEPROM after changing the CLI profile:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 The CLI profile enables MSP RC:
@@ -64,7 +64,7 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 Then run the hover controller in a separate terminal:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5
+scripts/missions/hover_msp_controller.py --target-altitude 5
 ```
 
 For the full direct Python workflow, including PID tuning and the Gazebo hover view, see:
@@ -76,25 +76,25 @@ docs/usage/msp_hover_python.md
 Run with gentler output:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5 --kp 60 --kd 45 --max-throttle 1650
+scripts/missions/hover_msp_controller.py --target-altitude 5 --kp 60 --kd 45 --max-throttle 1650
 ```
 
 Run with integral correction to close steady-state altitude error:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/missions/hover_msp_controller.py --target-altitude 5 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 Run for a fixed time:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5 --duration 30
+scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 30
 ```
 
 When `--duration` is set, the controller descends before disarming. Tune that phase with:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5 --duration 30 --descent-duration 8 --landing-altitude 0.15
+scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 30 --descent-duration 8 --landing-altitude 0.15
 ```
 
 ## Arm Sequence

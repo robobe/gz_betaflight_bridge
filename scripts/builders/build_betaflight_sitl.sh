@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
 BETAFLIGHT_REPOSITORY="${BETAFLIGHT_REPOSITORY:-https://github.com/betaflight/betaflight.git}"
 SOURCE_DIR="${BETAFLIGHT_SOURCE_DIR:-${PROJECT_ROOT}/external/betaflight}"
 OUTPUT_DIR="${PROJECT_ROOT}/bin"

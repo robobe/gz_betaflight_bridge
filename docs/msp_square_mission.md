@@ -19,7 +19,7 @@ The script selects the `X3` model from that `gz.msgs.Pose_V` stream.
 Generate the MSP RC EEPROM once:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 Run the full stack and square mission:
@@ -100,7 +100,7 @@ Default RC direction assumptions:
 That means pitch-forward initially sends less than `1500`, and roll-right initially sends more than `1500`. These signs are configurable:
 
 ```bash
-scripts/msp_square_mission.py --pitch-forward-sign -1 --roll-right-sign 1
+scripts/missions/msp_square_mission.py --pitch-forward-sign -1 --roll-right-sign 1
 ```
 
 If a Betaflight setup uses opposite stick signs, invert the relevant flag.

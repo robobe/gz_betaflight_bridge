@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
 SITL_BIN="${PROJECT_ROOT}/bin/betaflight_SITL.elf"
 
 if [[ ! -x "${SITL_BIN}" ]]; then
@@ -12,4 +12,3 @@ if [[ ! -x "${SITL_BIN}" ]]; then
 fi
 
 exec "${SITL_BIN}" "$@"
-

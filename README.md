@@ -63,7 +63,7 @@ build/debug/betaflight_gazebo_bridge
 Build Betaflight SITL with:
 
 ```bash
-scripts/build_betaflight_sitl.sh
+scripts/builders/build_betaflight_sitl.sh
 ```
 
 The script lists the three newest stable `X.Y.Z` tags, excluding alpha, beta,
@@ -140,14 +140,14 @@ launcher remain unchanged.
 Run the sensor world directly:
 
 ```bash
-scripts/run_quadcopter_sensor_world.sh -r
+scripts/worlds/run_quadcopter_sensor_world.sh -r
 ```
 
 Run the navigation practice world with trees, a house, flight gate, tower,
 and five marked points of interest:
 
 ```bash
-scripts/run_quadcopter_navigation_world.sh -r
+scripts/worlds/run_quadcopter_navigation_world.sh -r
 ```
 
 The camera publishes 640x480 RGB images at 30 Hz on:
@@ -200,10 +200,10 @@ The task opens four split terminals in one terminal panel group:
 
 | Task | Starts |
 |---|---|
-| `Stack: gazebo` | `scripts/run_quadcopter_world.sh -r` |
-| `Stack: gazebo sensor` | `scripts/run_quadcopter_sensor_world.sh -r` |
-| `Stack: sitl` | `scripts/run_betaflight_sitl.sh` |
-| `Stack: bridge` | `scripts/run_bridge.sh config/bridge.yaml` |
+| `Stack: gazebo` | `scripts/worlds/run_quadcopter_world.sh -r` |
+| `Stack: gazebo sensor` | `scripts/worlds/run_quadcopter_sensor_world.sh -r` |
+| `Stack: sitl` | `scripts/run/run_betaflight_sitl.sh` |
+| `Stack: bridge` | `scripts/run/run_bridge.sh config/bridge.yaml` |
 | `Stack: websockify` | `uv run websockify 127.0.0.1:6761 127.0.0.1:5761` |
 
 
@@ -224,16 +224,16 @@ windows:
     panes:
       - shell_command:
           - printf '\033]2;%s\033\\' 'gazebo'
-          - ./scripts/run_quadcopter_world.sh -r
+          - ./scripts/worlds/run_quadcopter_world.sh -r
       - shell_command:
           - printf '\033]2;%s\033\\' 'websockify'
           - uv run websockify 127.0.0.1:6761 127.0.0.1:5761
       - shell_command:
           - printf '\033]2;%s\033\\' 'sitl'
-          - ./scripts/run_betaflight_sitl.sh
+          - ./scripts/run/run_betaflight_sitl.sh
       - shell_command:
           - printf '\033]2;%s\033\\' 'bridge'
-          - ./scripts/run_bridge.sh config/bridge.yaml
+          - ./scripts/run/run_bridge.sh config/bridge.yaml
 
 ```
 
@@ -275,7 +275,7 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 After the bridge is running and receiving Gazebo sensor data, run the MSP hover controller in another terminal:
 
 ```bash
-scripts/hover_msp_controller.py \
+scripts/missions/hover_msp_controller.py \
   --target-altitude 5 \
   --duration 45 \
   --hover-throttle 1750 \

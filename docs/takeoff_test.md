@@ -3,7 +3,7 @@
 The bridge does not auto-arm Betaflight and does not generate RC commands. RC testing is handled by:
 
 ```text
-scripts/send_rc_test.py
+scripts/tests/send_rc_test.py
 ```
 
 This separation keeps production bridge behavior simple and avoids accidental arming.
@@ -13,19 +13,19 @@ This separation keeps production bridge behavior simple and avoids accidental ar
 Terminal 1:
 
 ```bash
-scripts/run_quadcopter_world.sh
+scripts/worlds/run_quadcopter_world.sh
 ```
 
 Terminal 2:
 
 ```bash
-scripts/run_betaflight_sitl.sh
+scripts/run/run_betaflight_sitl.sh
 ```
 
 Terminal 3:
 
 ```bash
-scripts/run_bridge.sh
+scripts/run/run_bridge.sh
 ```
 
 Expected bridge status:
@@ -41,7 +41,7 @@ motor_packets increasing
 Send centered sticks with low throttle:
 
 ```bash
-scripts/send_rc_test.py --duration 10
+scripts/tests/send_rc_test.py --duration 10
 ```
 
 ## Explicit arming test
@@ -49,7 +49,7 @@ scripts/send_rc_test.py --duration 10
 Only run this when Gazebo, SITL, and the bridge are already connected:
 
 ```bash
-scripts/send_rc_test.py --arm --angle --duration 10
+scripts/tests/send_rc_test.py --arm --angle --duration 10
 ```
 
 This checks that AUX1 high arms and AUX2 high enables ANGLE mode. It is not a takeoff command because throttle remains low.
@@ -61,13 +61,13 @@ The UDP RC script is still useful for old smoke tests, but the current EEPROM pr
 Stop the stack, then generate the UDP EEPROM profile once:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_udp_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_udp_modes.cli
 ```
 
 Use the continuous UDP takeoff sequence after Gazebo, SITL, and the bridge are running:
 
 ```bash
-scripts/send_rc_test.py --takeoff-sequence
+scripts/tests/send_rc_test.py --takeoff-sequence
 ```
 
 The sequence sends:
@@ -82,7 +82,7 @@ The sequence sends:
 The default `--ramp-end 2000` is intentionally strong for the X3 example model. For a gentler test, lower it:
 
 ```bash
-scripts/send_rc_test.py --takeoff-sequence --ramp-end 1600
+scripts/tests/send_rc_test.py --takeoff-sequence --ramp-end 1600
 ```
 
 If Gazebo receives motor commands but the vehicle does not move, confirm the world loads the physics system:
@@ -119,7 +119,7 @@ For altitude hold, prefer the MSP hover controller. It reads Betaflight altitude
 Regenerate EEPROM once after enabling MSP RC:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 Start Gazebo, Betaflight SITL, the bridge, and websockify with the VS Code task:
@@ -131,13 +131,13 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 For terminal-only debugging, start only Gazebo, SITL, and the bridge:
 
 ```bash
-scripts/run_takeoff_stack.sh
+scripts/run/run_takeoff_stack.sh
 ```
 
 Then run hover in another terminal:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 See:

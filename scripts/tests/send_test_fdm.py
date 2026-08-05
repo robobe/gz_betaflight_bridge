@@ -2,7 +2,6 @@
 """Send minimal Betaflight SITL FDM packets to UDP 9003."""
 
 import argparse
-import math
 import socket
 import struct
 import time
@@ -53,4 +52,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

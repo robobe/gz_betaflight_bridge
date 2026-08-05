@@ -7,7 +7,7 @@ This scenario verifies Betaflight's native `ALTHOLD` mode through AUX3. The Pyth
 Generate the EEPROM once, or repeat this step after changing the mode profile:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 The profile uses AUX1 for ARM, AUX2 for ANGLE, and AUX3 for ALTHOLD. It sets `ap_hover_throttle = 1700`, matching the upper end of the X3 model's observed hover range and avoiding a throttle drop caused by RC shaping during mode entry. AUX3 remains low until after arming and takeoff because Betaflight prevents arming while ALTHOLD is selected.
@@ -23,7 +23,7 @@ Command Palette -> Tasks: Run Task -> Stack: run tmuxp
 Leave that tmux session running. In a second terminal, run:
 
 ```bash
-python3 scripts/run_althold_test.py
+python3 scripts/tests/run_althold_test.py
 ```
 
 Alternatively, select the VS Code task `Test: Betaflight ALT HOLD` after the stack is ready and the bridge is publishing live IMU and altimeter data.
@@ -42,7 +42,7 @@ Every measured hold must stay within 0.5 m of its target. A successful run print
 ## Useful options
 
 ```bash
-python3 scripts/run_althold_test.py \
+python3 scripts/tests/run_althold_test.py \
   --takeoff-altitude 3 \
   --altitude-step 1 \
   --althold-throttle 1700 \
@@ -51,4 +51,4 @@ python3 scripts/run_althold_test.py \
   --phase-timeout 30
 ```
 
-Use `python3 scripts/run_althold_test.py --help` for all timing, throttle, and MSP connection options.
+Use `python3 scripts/tests/run_althold_test.py --help` for all timing, throttle, and MSP connection options.

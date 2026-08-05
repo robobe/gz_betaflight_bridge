@@ -15,7 +15,7 @@ cd /home/user/projects/gz_betaflight_bridge
 Generate the MSP RC EEPROM profile:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 This profile sets:
@@ -30,7 +30,7 @@ AUX2 high = ANGLE
 Calibrate the joystick once:
 
 ```bash
-scripts/joystick_rc_msp.py calibrate --device /dev/input/js0
+scripts/tools/joystick_rc_msp.py calibrate --device /dev/input/js0
 ```
 
 Calibration writes:
@@ -58,15 +58,15 @@ ss -ltnp | grep 5761
 Run:
 
 ```bash
-scripts/joystick_rc_msp.py run --device /dev/input/js0
+scripts/tools/joystick_rc_msp.py run --device /dev/input/js0
 ```
 
 Useful options:
 
 ```bash
-scripts/joystick_rc_msp.py run --device /dev/input/js0 --host 127.0.0.1 --port 5761 --rate 50
-scripts/joystick_rc_msp.py run --device /dev/input/js0 --config config/my_joystick.json
-scripts/joystick_rc_msp.py run --device /dev/input/js0 --print-period 0.25
+scripts/tools/joystick_rc_msp.py run --device /dev/input/js0 --host 127.0.0.1 --port 5761 --rate 50
+scripts/tools/joystick_rc_msp.py run --device /dev/input/js0 --config config/my_joystick.json
+scripts/tools/joystick_rc_msp.py run --device /dev/input/js0 --print-period 0.25
 ```
 
 The script prints live RC values:
@@ -224,12 +224,12 @@ Then log out and log in again.
 If Betaflight does not react, confirm the MSP profile and TCP listener:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ss -ltnp | grep 5761
 ```
 
 If the joystick mapping is wrong, recalibrate:
 
 ```bash
-scripts/joystick_rc_msp.py calibrate --device /dev/input/js0
+scripts/tools/joystick_rc_msp.py calibrate --device /dev/input/js0
 ```

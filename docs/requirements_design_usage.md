@@ -124,7 +124,7 @@ Print executable version:
 Generate `eeprom.bin` once:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 This maps:
@@ -152,7 +152,7 @@ This VS Code task starts:
 Then run the Python hover controller in a separate terminal:
 
 ```bash
-scripts/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 For detailed PID tuning and descent behavior, see `docs/usage/msp_hover_python.md`.
@@ -160,29 +160,29 @@ For detailed PID tuning and descent behavior, see `docs/usage/msp_hover_python.m
 Bridge-only stack launch:
 
 ```bash
-scripts/run_takeoff_stack.sh --headless
+scripts/run/run_takeoff_stack.sh --headless
 ```
 
 Legacy UDP RC takeoff smoke test:
 
 ```bash
-scripts/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
+scripts/run/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
 ```
 
 Manual MSP hover flow:
 
 ```bash
-scripts/run_takeoff_stack.sh
-scripts/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/run/run_takeoff_stack.sh
+scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 Manual launch order:
 
 ```bash
-scripts/run_quadcopter_world.sh
-scripts/run_betaflight_sitl.sh
-scripts/run_bridge.sh
-scripts/hover_msp_controller.py --target-altitude 5
+scripts/worlds/run_quadcopter_world.sh
+scripts/run/run_betaflight_sitl.sh
+scripts/run/run_bridge.sh
+scripts/missions/hover_msp_controller.py --target-altitude 5
 ```
 
 The dependency order matters:

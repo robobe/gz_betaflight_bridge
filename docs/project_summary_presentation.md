@@ -32,9 +32,9 @@ flowchart LR
 - Betaflight SITL binary: `bin/betaflight_SITL.elf`
 - Bridge executable: `build/debug/betaflight_gazebo_bridge`
 - Bridge config: `config/bridge.yaml`
-- MSP hover controller: `scripts/hover_msp_controller.py`
+- MSP hover controller: `scripts/missions/hover_msp_controller.py`
 - VS Code stack task: `Stack: run all`
-- Bridge-only stack launcher: `scripts/run_takeoff_stack.sh`
+- Bridge-only stack launcher: `scripts/run/run_takeoff_stack.sh`
 
 ## Slide 5: Core Bridge Responsibilities
 
@@ -94,19 +94,19 @@ Important defaults:
 Generate EEPROM once:
 
 ```bash
-scripts/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
+scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
 ```
 
 Run the whole stack:
 
 ```bash
-scripts/run_takeoff_stack.sh
+scripts/run/run_takeoff_stack.sh
 ```
 
 Run headless:
 
 ```bash
-scripts/run_takeoff_stack.sh --headless
+scripts/run/run_takeoff_stack.sh --headless
 ```
 
 ## Slide 10: Important Debug Finding

@@ -17,7 +17,7 @@ Run with an explicit config:
 Run through the helper script:
 
 ```bash
-scripts/run_bridge.sh
+scripts/run/run_bridge.sh
 ```
 
 ## YAML
