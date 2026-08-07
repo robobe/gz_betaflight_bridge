@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Run the MSP yaw excursion mission."""
 
 import sys
 from pathlib import Path

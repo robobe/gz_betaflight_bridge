@@ -1,5 +1,5 @@
-"""Three-metre hover and 180-degree yaw excursion mission."""
+"""Hover-derived CCW/CW yaw excursion mission."""
 
-from .mission import MissionConfig, MissionFailure, YawMission
+from .controller import MissionFailure, Phase, YawMissionConfig, YawMissionController
 
-__all__ = ["MissionConfig", "MissionFailure", "YawMission"]
+__all__ = ["MissionFailure", "Phase", "YawMissionConfig", "YawMissionController"]

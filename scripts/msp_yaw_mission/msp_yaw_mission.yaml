@@ -1,0 +1,76 @@
+connection:
+  host: 127.0.0.1
+  port: 5761
+  timeout_s: 1.0
+
+control:
+  hover_throttle: 1660
+  kp: 20.0
+  ki: 10.0
+  kd: 30.0
+  velocity_filter_time_constant_s: 0.25
+  integral_limit_m_s: 8.0
+  min_throttle: 1300
+  max_throttle: 1850
+  throttle_slew_rate_pwm_s: 1000.0
+  integral_gate_error_m: 0.30
+  integral_gate_speed_mps: 0.50
+
+mission:
+  target_altitude_m: 5.0
+  rate_hz: 25.0
+  prearm_duration_s: 3.0
+  low_throttle: 1000
+  disarm_burst_s: 1.0
+  angle_mode: true
+
+takeoff:
+  liftoff_height_m: 0.05
+  liftoff_speed_mps: 0.10
+  liftoff_timeout_s: 3.0
+  climb_rate_mps: 1.0
+  climb_feedforward_pwm: 30
+  max_lag_m: 0.75
+  ready_dwell_s: 0.0
+  ready_speed_mps: 1.0
+  timeout_s: 20.0
+
+hover:
+  altitude_tolerance_m: 0.15
+  settle_duration_s: 1.0
+  settle_timeout_s: 10.0
+
+yaw:
+  angle_deg: 180.0
+  rate_dps: 15.0
+  rate_feedforward_pwm: 20
+  rate_kp_pwm_per_dps: 2.0
+  rate_filter_time_constant_s: 0.15
+  max_offset_pwm: 60
+  slew_rate_pwm_s: 60.0
+  slow_zone_deg: 60.0
+  tolerance_deg: 5.0
+  settle_s: 0.5
+  timeout_s: 40.0
+  # Pause yaw only outside the altitude PID's normal recovery envelope.
+  altitude_gate_error_m: 0.30
+  altitude_gate_speed_mps: 0.50
+  max_altitude_error_m: 0.75
+  clockwise_pwm_sign: 1
+
+landing:
+  descent_rate_mps: 1.0
+  height_m: 0.15
+  speed_mps: 0.15
+  settle_s: 0.5
+  timeout_s: 20.0
+
+safety:
+  arming_timeout_s: 5.0
+  telemetry_stale_s: 0.30
+  status_period_s: 0.2
+
+logging:
+  directory: logs/msp-yaw
+  console_period_s: 0.5
+  csv_flush_period_s: 1.0

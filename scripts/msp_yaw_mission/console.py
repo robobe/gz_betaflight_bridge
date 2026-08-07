@@ -19,7 +19,13 @@ def colors_enabled() -> bool:
     return "NO_COLOR" not in os.environ and sys.stdout.isatty()
 
 
-def colorize(message: str, color: str, *, bold: bool = False, enabled: bool | None = None) -> str:
+def colorize(
+    message: str,
+    color: str,
+    *,
+    bold: bool = False,
+    enabled: bool | None = None,
+) -> str:
     use_color = colors_enabled() if enabled is None else enabled
     if not use_color:
         return message
@@ -31,12 +37,13 @@ def phase_color(phase: Enum) -> str:
     return {
         "prearm": BLUE,
         "arming": YELLOW,
+        "liftoff": GREEN,
         "takeoff": GREEN,
         "settle": CYAN,
-        "yaw_cw_180": MAGENTA,
-        "yaw_ccw_home": BLUE,
-        "descend_1_mps": CYAN,
-        "abort_step_descent": RED,
+        "yaw_ccw_180": MAGENTA,
+        "yaw_cw_home": BLUE,
+        "descend": CYAN,
+        "abort_descend": RED,
     }.get(str(phase.value), CYAN)
 
 
