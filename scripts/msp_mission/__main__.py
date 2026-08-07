@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from msp_hover.msp_client import MspClient
-from msp_hover.rc import RcSender
-from msp_hover.telemetry import AltitudeTelemetry
+from msp_core.client import MspClient
+from msp_core.rc import RcSender
+from msp_core.telemetry import AltitudeTelemetry
 
 from .cli import parse_args
 from .mission import SquareMissionController

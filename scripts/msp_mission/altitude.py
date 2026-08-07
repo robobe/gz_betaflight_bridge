@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from msp_hover.telemetry import AltitudeSample
+from msp_core.telemetry import AltitudeSample
 
 
 @dataclass

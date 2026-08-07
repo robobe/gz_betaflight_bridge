@@ -225,8 +225,8 @@ This applies SOLID pragmatically:
 - Each module has one reason to change.
 - Mission code depends on small MSP collaborators supplied to its constructor.
 - Later scripts can reuse the MSP core without inheriting this mission.
-- Existing `msp_hover` imports remain as compatibility adapters, avoiding a
-  forced migration of every current script.
+- All flight-policy modules import communication primitives directly from
+  `msp_core`; `msp_hover` contains no transport forwarding adapters.
 
 The architectural boundary is recorded in
 `docs/adr/0001-separate-msp-core-from-flight-missions.md`.

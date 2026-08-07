@@ -4,8 +4,8 @@ import argparse
 import time
 from pathlib import Path
 
-from msp_hover.msp_client import MspClient
-from msp_hover.rc import RcChannels, RcSender
+from msp_core.client import MspClient
+from msp_core.rc import RcChannels, RcSender
 
 from .app import DEFAULT_CONFIG
 from .calibration import JoystickCalibrator

@@ -6,11 +6,11 @@ import time
 from collections import deque
 from dataclasses import dataclass
 
-from msp_hover.msp_client import MspClient
-from msp_hover.msp_protocol import MSP_BOXIDS, MSP_STATUS
-from msp_hover.rc import RcChannels, RcSender
-from msp_hover.telemetry import AltitudeSample, AltitudeTelemetry
-from msp_hover.timing import RateLoop
+from msp_core.client import MspClient
+from msp_core.protocol import MSP_BOXIDS, MSP_STATUS
+from msp_core.rc import RcChannels, RcSender
+from msp_core.telemetry import AltitudeSample, AltitudeTelemetry
+from msp_core.timing import RateLoop
 
 from .cli import ScenarioConfig
 
@@ -68,11 +68,11 @@ def evaluate_hold(
         max_altitude_m=max(altitudes_m),
         max_error_m=max(abs(value - target_altitude_m) for value in altitudes_m),
     )
-    # if result.max_error_m > tolerance_m:
-    #     raise ScenarioFailure(
-    #         f"{name} exceeded altitude tolerance: max error {result.max_error_m:.2f}m "
-    #         f"> {tolerance_m:.2f}m"
-    #     )
+    if result.max_error_m > tolerance_m:
+        raise ScenarioFailure(
+            f"{name} exceeded altitude tolerance: max error {result.max_error_m:.2f}m "
+            f"> {tolerance_m:.2f}m"
+        )
     return result
 
 

@@ -3,10 +3,10 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 
-from msp_hover.msp_client import MspClient
-from msp_hover.rc import RcChannels, RcSender
-from msp_hover.telemetry import AltitudeTelemetry
-from msp_hover.timing import RateLoop
+from msp_core.client import MspClient
+from msp_core.rc import RcChannels, RcSender
+from msp_core.telemetry import AltitudeTelemetry
+from msp_core.timing import RateLoop
 
 from .altitude import AltitudeController
 from .geometry import Vec2, rotate_body_to_world

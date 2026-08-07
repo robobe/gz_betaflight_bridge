@@ -3,10 +3,10 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 
-from .msp_client import MspClient
-from .rc import RcChannels, RcSender
-from .telemetry import AltitudeSample, AltitudeTelemetry
-from .timing import RateLoop
+from msp_core.client import MspClient
+from msp_core.rc import RcChannels, RcSender
+from msp_core.telemetry import AltitudeSample, AltitudeTelemetry
+from msp_core.timing import RateLoop
 
 
 @dataclass(frozen=True)

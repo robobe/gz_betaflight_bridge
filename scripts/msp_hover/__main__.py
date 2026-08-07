@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from msp_core.client import MspClient
+from msp_core.rc import RcSender
+from msp_core.telemetry import AltitudeTelemetry
+
 from .cli import parse_args
 from .controller import HoverController
-from .msp_client import MspClient
-from .rc import RcSender
-from .telemetry import AltitudeTelemetry
 
 
 def main() -> int:
@@ -23,4 +24,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

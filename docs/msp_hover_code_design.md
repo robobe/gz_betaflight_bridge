@@ -8,13 +8,13 @@ The MSP hover controller is split into small modules so each concern is isolated
 flowchart TB
     WRAP[hover_msp_controller.py] --> MAIN[__main__.py]
     CLI[cli.py] --> MAIN
-    MAIN --> CLIENT[msp_client.py]
-    MAIN --> TEL[telemetry.py]
-    MAIN --> RC[rc.py]
+    MAIN --> CLIENT[msp_core/client.py]
+    MAIN --> TEL[msp_core/telemetry.py]
+    MAIN --> RC[msp_core/rc.py]
     MAIN --> CTRL[controller.py]
-    MAIN --> TIME[timing.py]
+    CTRL --> TIME[msp_core/timing.py]
 
-    CLIENT --> PROTO[msp_protocol.py]
+    CLIENT --> PROTO[msp_core/protocol.py]
     TEL --> CLIENT
     RC --> CLIENT
     CTRL --> TEL
@@ -26,14 +26,14 @@ flowchart TB
 
 | Module | Responsibility |
 |---|---|
-| `msp_protocol.py` | Build and parse MSP v1 byte frames |
-| `msp_client.py` | TCP connection, reads, writes, request/response matching |
-| `telemetry.py` | Decode `MSP_ALTITUDE` into meters and meters per second |
-| `rc.py` | Build 16-channel RC payloads and send `MSP_SET_RAW_RC` |
-| `controller.py` | Arm sequence, hover phases, throttle control, disarm |
-| `timing.py` | Fixed-rate loop timing |
-| `cli.py` | User options and runtime configuration |
-| `__main__.py` | Wire dependencies and run the controller |
+| `msp_core/protocol.py` | Build and parse MSP v1 byte frames |
+| `msp_core/client.py` | TCP connection, reads, writes, request/response matching |
+| `msp_core/telemetry.py` | Decode `MSP_ALTITUDE` into meters and meters per second |
+| `msp_core/rc.py` | Build 16-channel RC payloads and send `MSP_SET_RAW_RC` |
+| `msp_core/timing.py` | Fixed-rate loop timing |
+| `msp_hover/controller.py` | Arm sequence, hover phases, throttle control, disarm |
+| `msp_hover/cli.py` | User options and runtime configuration |
+| `msp_hover/__main__.py` | Wire core dependencies and run the controller |
 
 ## SOLID Mapping
 
