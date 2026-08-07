@@ -44,6 +44,7 @@ class MissionConfig:
     altitude_kp: float = 20.0
     altitude_ki: float = 0.0
     altitude_kd: float = 5.0
+    velocity_filter_time_constant_s: float = 0.25
     integral_limit_m_s: float = 8.0
     min_throttle: int = 1300
     max_throttle: int = 1850
@@ -97,6 +98,8 @@ class MissionConfig:
             raise ValueError("takeoff step dwell and speed gate must be valid")
         if self.throttle_slew_rate_pwm_s <= 0.0:
             raise ValueError("throttle_slew_rate_pwm_s must be positive")
+        if self.velocity_filter_time_constant_s < 0.0:
+            raise ValueError("velocity_filter_time_constant_s must not be negative")
         if not 800 <= self.low_throttle <= self.min_throttle <= self.max_throttle <= 2200:
             raise ValueError("throttle limits must be ordered within the RC range")
         if not 0 < self.yaw_min_offset_pwm <= self.yaw_max_offset_pwm <= 700:
@@ -164,7 +167,9 @@ class YawMission:
         descent_start_altitude_m: float | None = None
         abort_target_m: float | None = None
         abort_reason: str | None = None
-        velocity_estimator = VerticalVelocityEstimator()
+        velocity_estimator = VerticalVelocityEstimator(
+            self._config.velocity_filter_time_constant_s
+        )
         last_log_s = 0.0
         armed_confirmed = False
 

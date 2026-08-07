@@ -224,7 +224,7 @@ else
 fi
 echo
 echo "Run MSP hover in another terminal with:"
-echo "  scripts/missions/hover_msp_controller.py --target-altitude 5"
+echo "  scripts/msp_hover/hover_msp_controller.py --target-altitude 5"
 echo
 echo "Press Ctrl+C here to stop Gazebo, SITL, bridge, and optional RC."
 

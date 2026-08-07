@@ -38,7 +38,7 @@ save
 `RX_MSP` is required for scripts that send RC with `MSP_SET_RAW_RC`, such as:
 
 ```text
-scripts/missions/hover_msp_controller.py
+scripts/msp_hover/hover_msp_controller.py
 ```
 
 CLI field meaning:
@@ -101,7 +101,7 @@ scripts/run/run_betaflight_sitl.sh
 The legacy UDP RC script only works when `RX_UDP` is enabled. The current profile enables `RX_MSP`, so use the MSP hover controller for RC control.
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5
 ```
 
 To return to UDP RC smoke tests, change the features back to:

@@ -32,7 +32,7 @@ flowchart LR
 - Betaflight SITL binary: `bin/betaflight_SITL.elf`
 - Bridge executable: `build/debug/betaflight_gazebo_bridge`
 - Bridge config: `config/bridge.yaml`
-- MSP hover controller: `scripts/missions/hover_msp_controller.py`
+- MSP hover controller: `scripts/msp_hover/hover_msp_controller.py`
 - VS Code stack task: `Stack: run all`
 - Bridge-only stack launcher: `scripts/run/run_takeoff_stack.sh`
 

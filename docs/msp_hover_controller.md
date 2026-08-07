@@ -64,7 +64,7 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 Then run the hover controller in a separate terminal:
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5
 ```
 
 For the full direct Python workflow, including PID tuning and the Gazebo hover view, see:
@@ -76,25 +76,25 @@ docs/usage/msp_hover_python.md
 Run with gentler output:
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5 --kp 60 --kd 45 --max-throttle 1650
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --kp 60 --kd 45 --max-throttle 1650
 ```
 
 Run with integral correction to close steady-state altitude error:
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 Run for a fixed time:
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 30
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --duration 30
 ```
 
 When `--duration` is set, the controller descends before disarming. Tune that phase with:
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 30 --descent-duration 8 --landing-altitude 0.15
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --duration 30 --descent-duration 8 --landing-altitude 0.15
 ```
 
 ## Arm Sequence

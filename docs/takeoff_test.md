@@ -137,7 +137,7 @@ scripts/run/run_takeoff_stack.sh
 Then run hover in another terminal:
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 See:

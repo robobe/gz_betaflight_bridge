@@ -275,7 +275,7 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 After the bridge is running and receiving Gazebo sensor data, run the MSP hover controller in another terminal:
 
 ```bash
-scripts/missions/hover_msp_controller.py \
+scripts/msp_hover/hover_msp_controller.py \
   --target-altitude 5 \
   --duration 45 \
   --hover-throttle 1750 \

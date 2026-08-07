@@ -152,7 +152,7 @@ This VS Code task starts:
 Then run the Python hover controller in a separate terminal:
 
 ```bash
-scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 For detailed PID tuning and descent behavior, see `docs/usage/msp_hover_python.md`.
@@ -173,7 +173,7 @@ Manual MSP hover flow:
 
 ```bash
 scripts/run/run_takeoff_stack.sh
-scripts/missions/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
 ```
 
 Manual launch order:
@@ -182,7 +182,7 @@ Manual launch order:
 scripts/worlds/run_quadcopter_world.sh
 scripts/run/run_betaflight_sitl.sh
 scripts/run/run_bridge.sh
-scripts/missions/hover_msp_controller.py --target-altitude 5
+scripts/msp_hover/hover_msp_controller.py --target-altitude 5
 ```
 
 The dependency order matters:

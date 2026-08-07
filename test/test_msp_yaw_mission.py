@@ -106,14 +106,18 @@ class YawControlTest(unittest.TestCase):
 
         self.assertGreater(demand, 1660)
 
-    def test_velocity_estimator_uses_reported_vario_for_held_altitude_samples(self) -> None:
+    def test_velocity_estimator_uses_filtered_altitude_derivative_not_reported_vario(self) -> None:
         estimator = VerticalVelocityEstimator()
 
-        estimator.update(AltitudeSample(1.0, 1.2, 1.0))
-        velocity_mps, dt_s = estimator.update(AltitudeSample(1.5, 1.1, 1.04))
+        dt_s = 0.04
+        velocity_mps = 0.0
+        for index in range(51):
+            velocity_mps, measured_dt_s = estimator.update(
+                AltitudeSample(index * dt_s, 2.0, index * dt_s)
+            )
 
-        self.assertAlmostEqual(velocity_mps, 1.1)
-        self.assertAlmostEqual(dt_s, 0.04)
+        self.assertAlmostEqual(velocity_mps, 1.0, delta=0.05)
+        self.assertAlmostEqual(measured_dt_s, dt_s)
 
     def test_default_altitude_control_reaches_and_holds_target(self) -> None:
         config = MissionConfig()
@@ -326,6 +330,7 @@ class MissionSequenceTest(unittest.TestCase):
                 altitude_settle_s=0.0,
                 yaw_settle_s=0.0,
                 landing_settle_s=0.0,
+                velocity_filter_time_constant_s=1000.0,
                 disarm_burst_s=0.0,
             ),
             SequenceTelemetry(altitude_samples),  # type: ignore[arg-type]
