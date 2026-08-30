@@ -27,6 +27,26 @@ int main()
     }
     assert(threw);
 
+    BridgeConfig emptyNavSat;
+    emptyNavSat.gazebo.navsatTopic = "";
+    threw = false;
+    try {
+        ConfigLoader::Validate(emptyNavSat);
+    } catch (const std::runtime_error &) {
+        threw = true;
+    }
+    assert(threw);
+
+    BridgeConfig gpsWithoutTopic;
+    gpsWithoutTopic.fdm.altitudeSource = "gps";
+    threw = false;
+    try {
+        ConfigLoader::Validate(gpsWithoutTopic);
+    } catch (const std::runtime_error &) {
+        threw = true;
+    }
+    assert(threw);
+
     const auto logicalMotors = SitlPacketToBetaflightMotorOrder({20.0, 30.0, 40.0, 10.0});
     assert(logicalMotors[0] == 10.0);  // M1
     assert(logicalMotors[1] == 20.0);  // M2
@@ -78,6 +98,27 @@ int main()
     assert(packet.imuOrientationQuat[3] == -0.5);
     assert(packet.pressure > 90000.0);
     assert(packet.pressure < 101325.0);
+
+    snapshot.longitudeDeg = 34.7818;
+    snapshot.latitudeDeg = 32.0853;
+    snapshot.gpsAltitude = 120.0;
+    snapshot.velocityEast = 3.0;
+    snapshot.velocityNorth = 4.0;
+    snapshot.velocityUp = 5.0;
+    snapshot.hasNavSat = true;
+    const auto altimeterGpsPacket = builder.Build(snapshot, 12.5);
+    assert(altimeterGpsPacket.positionXyz[0] == 34.7818);
+    assert(altimeterGpsPacket.positionXyz[1] == 32.0853);
+    assert(altimeterGpsPacket.positionXyz[2] == 100.0);
+    assert(altimeterGpsPacket.velocityXyz[0] == 3.0);
+    assert(altimeterGpsPacket.velocityXyz[1] == 4.0);
+    assert(altimeterGpsPacket.velocityXyz[2] == 2.0);
+
+    FdmConfig gpsAltitudeConfig;
+    gpsAltitudeConfig.altitudeSource = "gps";
+    const auto gpsPacket = FdmBuilder(gpsAltitudeConfig).Build(snapshot, 12.5);
+    assert(gpsPacket.positionXyz[2] == 120.0);
+    assert(gpsPacket.velocityXyz[2] == 5.0);
 
     FdmConfig passthroughConfig;
     passthroughConfig.frameMode = "passthrough";

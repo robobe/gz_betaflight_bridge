@@ -7,12 +7,14 @@ sitl:
 gazebo:
   imu_topic: /imu
   altimeter_topic: /altimeter
+  navsat_topic: /navsat
   actuator_topic: /X3/gazebo/command/motor_speed
 
 fdm:
   rate_hz: 500
   frame_mode: gazebo_bridge
   pressure_mode: from_altitude
+  altitude_source: altimeter
   sea_level_pressure_pa: 101325.0
 
 motors:

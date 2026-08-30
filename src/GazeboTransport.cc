@@ -37,6 +37,7 @@ std::array<double, 4> FluBodyToEnuWorldQuatToGazeboBridgeQuat(const std::array<d
 }  // namespace
 
 GazeboStateSubscriber::GazeboStateSubscriber(const GazeboConfig &config)
+    : navsatRequired_(config.navsatTopic.has_value())
 {
     if (!node_.Subscribe(config.imuTopic, &GazeboStateSubscriber::OnImu, this)) {
         throw std::runtime_error("Failed to subscribe to IMU topic: " + config.imuTopic);
@@ -44,13 +45,21 @@ GazeboStateSubscriber::GazeboStateSubscriber(const GazeboConfig &config)
     if (!node_.Subscribe(config.altimeterTopic, &GazeboStateSubscriber::OnAltimeter, this)) {
         throw std::runtime_error("Failed to subscribe to altimeter topic: " + config.altimeterTopic);
     }
-    spdlog::info("Subscribed to IMU [{}] and altimeter [{}]", config.imuTopic, config.altimeterTopic);
+    if (config.navsatTopic) {
+        if (!node_.Subscribe(*config.navsatTopic, &GazeboStateSubscriber::OnNavSat, this)) {
+            throw std::runtime_error("Failed to subscribe to NavSat topic: " + *config.navsatTopic);
+        }
+        spdlog::info("Subscribed to IMU [{}], altimeter [{}], and NavSat [{}]",
+                     config.imuTopic, config.altimeterTopic, *config.navsatTopic);
+    } else {
+        spdlog::info("Subscribed to IMU [{}] and altimeter [{}]", config.imuTopic, config.altimeterTopic);
+    }
 }
 
 std::optional<SensorSnapshot> GazeboStateSubscriber::Snapshot() const
 {
     std::lock_guard lock(mutex_);
-    if (!hasImu_ || !hasAltimeter_) {
+    if (!hasImu_ || !hasAltimeter_ || (navsatRequired_ && !snapshot_.hasNavSat)) {
         return std::nullopt;
     }
     return snapshot_;
@@ -66,6 +75,12 @@ bool GazeboStateSubscriber::HasAltimeter() const
 {
     std::lock_guard lock(mutex_);
     return hasAltimeter_;
+}
+
+bool GazeboStateSubscriber::HasNavSat() const
+{
+    std::lock_guard lock(mutex_);
+    return snapshot_.hasNavSat;
 }
 
 void GazeboStateSubscriber::OnImu(const gz::msgs::IMU &msg)
@@ -89,6 +104,18 @@ void GazeboStateSubscriber::OnAltimeter(const gz::msgs::Altimeter &msg)
     snapshot_.altitude = msg.vertical_position();
     snapshot_.verticalVelocity = msg.vertical_velocity();
     hasAltimeter_ = true;
+}
+
+void GazeboStateSubscriber::OnNavSat(const gz::msgs::NavSat &msg)
+{
+    std::lock_guard lock(mutex_);
+    snapshot_.longitudeDeg = msg.longitude_deg();
+    snapshot_.latitudeDeg = msg.latitude_deg();
+    snapshot_.gpsAltitude = msg.altitude();
+    snapshot_.velocityEast = msg.velocity_east();
+    snapshot_.velocityNorth = msg.velocity_north();
+    snapshot_.velocityUp = msg.velocity_up();
+    snapshot_.hasNavSat = true;
 }
 
 ActuatorPublisher::ActuatorPublisher(const GazeboConfig &config)
@@ -129,8 +156,15 @@ FdmPacket FdmBuilder::Build(const SensorSnapshot &snapshot, const double timesta
         packet.velocityXyz[i] = 0.0;
         packet.positionXyz[i] = 0.0;
     }
-    packet.velocityXyz[2] = snapshot.verticalVelocity;
-    packet.positionXyz[2] = snapshot.altitude;
+    if (snapshot.hasNavSat) {
+        packet.positionXyz[0] = snapshot.longitudeDeg;
+        packet.positionXyz[1] = snapshot.latitudeDeg;
+        packet.velocityXyz[0] = snapshot.velocityEast;
+        packet.velocityXyz[1] = snapshot.velocityNorth;
+    }
+    const bool gpsAltitude = config_.altitudeSource == "gps" && snapshot.hasNavSat;
+    packet.positionXyz[2] = gpsAltitude ? snapshot.gpsAltitude : snapshot.altitude;
+    packet.velocityXyz[2] = gpsAltitude ? snapshot.velocityUp : snapshot.verticalVelocity;
     for (std::size_t i = 0; i < 4; ++i) {
         packet.imuOrientationQuat[i] = orientationQuat[i];
     }

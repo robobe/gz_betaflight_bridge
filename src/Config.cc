@@ -47,12 +47,16 @@ BridgeConfig ConfigLoader::Load(const std::filesystem::path &path)
     const auto gazebo = root["gazebo"];
     ReadScalar(gazebo, "imu_topic", config.gazebo.imuTopic);
     ReadScalar(gazebo, "altimeter_topic", config.gazebo.altimeterTopic);
+    if (gazebo && gazebo["navsat_topic"]) {
+        config.gazebo.navsatTopic = gazebo["navsat_topic"].as<std::string>();
+    }
     ReadScalar(gazebo, "actuator_topic", config.gazebo.actuatorTopic);
 
     const auto fdm = root["fdm"];
     ReadScalar(fdm, "rate_hz", config.fdm.rateHz);
     ReadScalar(fdm, "frame_mode", config.fdm.frameMode);
     ReadScalar(fdm, "pressure_mode", config.fdm.pressureMode);
+    ReadScalar(fdm, "altitude_source", config.fdm.altitudeSource);
     ReadScalar(fdm, "sea_level_pressure_pa", config.fdm.seaLevelPressurePa);
 
     const auto motors = root["motors"];
@@ -84,6 +88,9 @@ void ConfigLoader::Validate(const BridgeConfig &config)
     if (config.gazebo.imuTopic.empty() || config.gazebo.altimeterTopic.empty() || config.gazebo.actuatorTopic.empty()) {
         throw std::runtime_error("Gazebo topics must not be empty");
     }
+    if (config.gazebo.navsatTopic && config.gazebo.navsatTopic->empty()) {
+        throw std::runtime_error("gazebo.navsat_topic must not be empty");
+    }
     if (config.fdm.rateHz <= 0.0) {
         throw std::runtime_error("fdm.rate_hz must be positive");
     }
@@ -95,6 +102,12 @@ void ConfigLoader::Validate(const BridgeConfig &config)
     }
     if (config.fdm.pressureMode != "from_altitude" && config.fdm.pressureMode != "zero") {
         throw std::runtime_error("fdm.pressure_mode must be 'from_altitude' or 'zero'");
+    }
+    if (config.fdm.altitudeSource != "altimeter" && config.fdm.altitudeSource != "gps") {
+        throw std::runtime_error("fdm.altitude_source must be 'altimeter' or 'gps'");
+    }
+    if (config.fdm.altitudeSource == "gps" && !config.gazebo.navsatTopic) {
+        throw std::runtime_error("fdm.altitude_source 'gps' requires gazebo.navsat_topic");
     }
     if (config.motors.timeoutSeconds <= 0.0) {
         throw std::runtime_error("motors.timeout_seconds must be positive");

@@ -156,8 +156,11 @@ void BridgeApp::LogStatusIfNeeded()
         return;
     }
     lastStatusLogTime_ = now;
-    spdlog::info("status imu={} altimeter={} fdm_packets={} motor_packets={} malformed_motor_packets={}",
-                 stateSubscriber_.HasImu(), stateSubscriber_.HasAltimeter(), fdmPackets_, motorPackets_, malformedMotorPackets_);
+    const char *navsatStatus = !config_.gazebo.navsatTopic ? "disabled" :
+        stateSubscriber_.HasNavSat() ? "ready" : "waiting";
+    spdlog::info("status imu={} altimeter={} navsat={} fdm_packets={} motor_packets={} malformed_motor_packets={}",
+                 stateSubscriber_.HasImu(), stateSubscriber_.HasAltimeter(), navsatStatus,
+                 fdmPackets_, motorPackets_, malformedMotorPackets_);
 }
 
 std::array<double, 4> BridgeApp::ZeroMotors() const

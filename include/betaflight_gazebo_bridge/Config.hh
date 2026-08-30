@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <string>
 
 namespace betaflight_gazebo_bridge
@@ -20,6 +21,7 @@ struct GazeboConfig
 {
     std::string imuTopic{"/imu"};
     std::string altimeterTopic{"/altimeter"};
+    std::optional<std::string> navsatTopic;
     std::string actuatorTopic{"/X3/gazebo/command/motor_speed"};
 };
 
@@ -28,6 +30,7 @@ struct FdmConfig
     double rateHz{500.0};
     std::string frameMode{"gazebo_bridge"};
     std::string pressureMode{"from_altitude"};
+    std::string altitudeSource{"altimeter"};
     double seaLevelPressurePa{101325.0};
 };
 
