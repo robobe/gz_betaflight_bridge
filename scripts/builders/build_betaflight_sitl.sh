@@ -7,6 +7,7 @@ BETAFLIGHT_REPOSITORY="${BETAFLIGHT_REPOSITORY:-https://github.com/betaflight/be
 SOURCE_DIR="${BETAFLIGHT_SOURCE_DIR:-${PROJECT_ROOT}/external/betaflight}"
 OUTPUT_DIR="${PROJECT_ROOT}/bin"
 OUTPUT_BINARY="${OUTPUT_DIR}/betaflight_SITL.elf"
+GPS_PATCH="${PROJECT_ROOT}/config/betaflight/virtual_gps.patch"
 BUILD_JOBS="${BUILD_JOBS:-$(nproc)}"
 
 log() {
@@ -78,6 +79,9 @@ done
 log_info "Selected Betaflight release: ${SELECTED_TAG}"
 
 if [[ -d "${SOURCE_DIR}/.git" ]]; then
+  if git -C "${SOURCE_DIR}" apply --reverse --check "${GPS_PATCH}" 2>/dev/null; then
+    git -C "${SOURCE_DIR}" apply --reverse "${GPS_PATCH}"
+  fi
   if [[ -n "$(git -C "${SOURCE_DIR}" status --porcelain)" ]]; then
     log_error "Refusing to update modified source tree: ${SOURCE_DIR}"
     exit 1
@@ -95,13 +99,17 @@ else
     "${BETAFLIGHT_REPOSITORY}" "${SOURCE_DIR}"
 fi
 
+git -C "${SOURCE_DIR}" submodule update --init --recursive
+git -C "${SOURCE_DIR}" apply "${GPS_PATCH}"
+
 # Betaflight validates its pinned ARM toolchain before selecting the native
 # compiler used by SITL. This target is idempotent after the first installation.
 log_info "Ensuring Betaflight's pinned build toolchain is installed."
 make -C "${SOURCE_DIR}" arm_sdk_install
 
-log_info "Building Betaflight ${SELECTED_TAG} for SITL with ${BUILD_JOBS} jobs."
-make -C "${SOURCE_DIR}" TARGET=SITL -j"${BUILD_JOBS}"
+log_info "Building Betaflight ${SELECTED_TAG} for SITL with GPS and ${BUILD_JOBS} jobs."
+make -C "${SOURCE_DIR}" TARGET=SITL EXTRA_FLAGS=
+-DUSE_GPS -j"${BUILD_JOBS}"
 
 BUILT_BINARY="${SOURCE_DIR}/obj/main/betaflight_SITL.elf"
 if [[ ! -x "${BUILT_BINARY}" ]]; then

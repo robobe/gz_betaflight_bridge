@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 MSP_API_VERSION = 1
 MSP_STATUS = 101
+MSP_RAW_GPS = 106
 MSP_ATTITUDE = 108
 MSP_ALTITUDE = 109
 MSP_BOXIDS = 119

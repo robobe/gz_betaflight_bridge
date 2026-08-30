@@ -1,0 +1,13 @@
+diff --git a/src/main/config/config.c b/src/main/config/config.c
+--- a/src/main/config/config.c
++++ b/src/main/config/config.c
+@@ -230,7 +230,7 @@ void validateAndFixConfig(void)
+     }
+ #endif
+     if (
+ #if defined(USE_GPS)
+-        gpsConfig()->provider != GPS_MSP && !gpsSerial &&
++        gpsConfig()->provider != GPS_MSP && gpsConfig()->provider != GPS_VIRTUAL && !gpsSerial &&
+ #endif
+         true) {
+         featureDisableImmediate(FEATURE_GPS);

@@ -5,6 +5,12 @@
   "C_Cpp.default.compileCommands": "${workspaceFolder}/build/debug/compile_commands.json",
   "files.associations": {
     "iostream": "cpp"
-  }
+  },
+  "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/include",
+    "${workspaceFolder}/src",
+    "/usr/local/include",
+    "/usr/include"
+  ]
 }
-
