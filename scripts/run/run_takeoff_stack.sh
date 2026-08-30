@@ -159,6 +159,21 @@ wait_for_udp_port() {
   done
 }
 
+wait_for_tcp_port() {
+  local port="$1"
+  local timeout_s="$2"
+  local start
+  start="$(date +%s)"
+
+  until (echo >"/dev/tcp/127.0.0.1/${port}") 2>/dev/null; do
+    if (( $(date +%s) - start >= timeout_s )); then
+      echo "Timed out waiting for TCP port: ${port}" >&2
+      return 1
+    fi
+    sleep 0.5
+  done
+}
+
 check_alive() {
   local index
   for index in "${!PIDS[@]}"; do
@@ -201,6 +216,7 @@ start_process "sitl" "${LOG_DIR}/sitl.log" \
   "${PROJECT_ROOT}/scripts/run/run_betaflight_sitl.sh"
 wait_for_udp_port 9003 15
 wait_for_udp_port 9004 15
+wait_for_tcp_port 5761 15
 check_alive
 
 start_process "bridge" "${LOG_DIR}/bridge.log" \

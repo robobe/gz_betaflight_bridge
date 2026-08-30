@@ -16,4 +16,5 @@ windows:
           - ./scripts/run/run_betaflight_sitl.sh
       - shell_command:
           - printf '\033]2;%s\033\\' 'bridge'
+          - until (echo > /dev/tcp/127.0.0.1/5761) 2>/dev/null; do sleep 0.1; done
           - ./scripts/run/run_bridge.sh config/bridge.yaml

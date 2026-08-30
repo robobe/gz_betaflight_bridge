@@ -88,6 +88,9 @@ if [[ -d "${SOURCE_DIR}/.git" ]]; then
   fi
   log_info "Fetching ${SELECTED_TAG} into the existing source tree."
   git -C "${SOURCE_DIR}" fetch --depth 1 origin "refs/tags/${SELECTED_TAG}:refs/tags/${SELECTED_TAG}"
+  if [[ "$(git -C "${SOURCE_DIR}" rev-parse HEAD)" != "$(git -C "${SOURCE_DIR}" rev-list -n 1 "${SELECTED_TAG}")" ]]; then
+    git -C "${SOURCE_DIR}" submodule deinit --all --force
+  fi
   git -C "${SOURCE_DIR}" checkout --detach "${SELECTED_TAG}"
 elif [[ -e "${SOURCE_DIR}" ]]; then
   log_error "Source path exists but is not a Git repository: ${SOURCE_DIR}"
@@ -100,7 +103,11 @@ else
 fi
 
 git -C "${SOURCE_DIR}" submodule update --init --recursive
-git -C "${SOURCE_DIR}" apply "${GPS_PATCH}"
+if git -C "${SOURCE_DIR}" apply --check "${GPS_PATCH}" 2>/dev/null; then
+  git -C "${SOURCE_DIR}" apply "${GPS_PATCH}"
+else
+  log_info "Selected release does not need the Betaflight 2025.12 virtual GPS patch."
+fi
 
 # Betaflight validates its pinned ARM toolchain before selecting the native
 # compiler used by SITL. This target is idempotent after the first installation.
@@ -108,8 +115,11 @@ log_info "Ensuring Betaflight's pinned build toolchain is installed."
 make -C "${SOURCE_DIR}" arm_sdk_install
 
 log_info "Building Betaflight ${SELECTED_TAG} for SITL with GPS and ${BUILD_JOBS} jobs."
-make -C "${SOURCE_DIR}" TARGET=SITL EXTRA_FLAGS=
--DUSE_GPS -j"${BUILD_JOBS}"
+if grep -qx '#define USE_GPS' "${SOURCE_DIR}/src/platform/SIMULATOR/target/SITL/target.h"; then
+  make -C "${SOURCE_DIR}" TARGET=SITL -j"${BUILD_JOBS}"
+else
+  make -C "${SOURCE_DIR}" TARGET=SITL EXTRA_FLAGS=-DUSE_GPS -j"${BUILD_JOBS}"
+fi
 
 BUILT_BINARY="${SOURCE_DIR}/obj/main/betaflight_SITL.elf"
 if [[ ! -x "${BUILT_BINARY}" ]]; then
