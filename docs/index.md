@@ -16,14 +16,7 @@ Start here when navigating the project docs.
 | Gazebo motor model | [gazebo_world_motor_model.md](gazebo_world_motor_model.md) | World structure and deep tuning of `MulticopterMotorModel` |
 | Coordinate frames | [coordinate_frames.md](coordinate_frames.md) | IMU, quaternion, and frame conversion choices |
 | GPS/FDM design | [design/gps_fdm_2025_12.md](design/gps_fdm_2025_12.md) | Adding Gazebo NavSat GPS for Betaflight 2025.12.x |
-| EEPROM setup | [betaflight_sitl_eeprom.md](betaflight_sitl_eeprom.md) | AUX1 ARM and AUX2 ANGLE setup for SITL |
-| Takeoff test | [takeoff_test.md](takeoff_test.md) | Running and diagnosing the RC takeoff smoke test |
-| Joystick RC | [joystick_rc.md](joystick_rc.md) | Calibrating a joystick and sending RC through MSP or UDP |
-| MSP hover Python usage | [usage/msp_hover_python.md](usage/msp_hover_python.md) | Direct `hover_msp_controller.py` run flow, PID tuning, and VS Code stack task |
-| MSP hover controller | [msp_hover_controller.md](msp_hover_controller.md) | Hover using MSP altitude and MSP RC |
-| MSP square mission | [msp_square_mission.md](msp_square_mission.md) | Closed-loop takeoff, square flight, landing, and disarm |
-| MSP hover code design | [msp_hover_code_design.md](msp_hover_code_design.md) | SOLID module design and diagrams |
-| MSP yaw mission design | [design/msp_yaw_mission.md](design/msp_yaw_mission.md) | Synthesized-RC takeoff, 180-degree yaw excursion, landing, and reusable MSP core |
+| SITL tools | [sitl_tools.md](sitl_tools.md) | Inspect Betaflight, GPS, and motor traffic |
 | Observability | [observability.md](observability.md) | Logs, topics, UDP checks, and troubleshooting signals |
 | Future capabilities | [future_capabilities.md](future_capabilities.md) | Ideas to improve simulation realism |
 | Original implementation plan | [betaflight_gazebo_bridge_plan.md](betaflight_gazebo_bridge_plan.md) | Historical milestone plan and deeper design notes |
@@ -33,9 +26,5 @@ Start here when navigating the project docs.
 1. [project_summary_presentation.md](project_summary_presentation.md)
 2. [requirements_design_usage.md](requirements_design_usage.md)
 3. [configuration.md](configuration.md)
-4. [takeoff_test.md](takeoff_test.md)
-5. [joystick_rc.md](joystick_rc.md)
-6. [usage/msp_hover_python.md](usage/msp_hover_python.md)
-7. [msp_hover_controller.md](msp_hover_controller.md)
-8. [msp_square_mission.md](msp_square_mission.md)
-9. [future_capabilities.md](future_capabilities.md)
+4. [sitl_tools.md](sitl_tools.md)
+5. [future_capabilities.md](future_capabilities.md)

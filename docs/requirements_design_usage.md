@@ -119,61 +119,25 @@ Print executable version:
 ./build/debug/betaflight_gazebo_bridge --version
 ```
 
-## Configure Betaflight EEPROM
-
-Generate `eeprom.bin` once:
-
-```bash
-scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
-```
-
-This maps:
-
-```text
-AUX1 high = ARM
-AUX2 high = ANGLE
-```
-
 ## Usage
 
-Recommended MSP hover workflow:
+Start the complete stack:
 
-```text
-Command Palette -> Tasks: Run Task -> Stack: run all
+```bash
+tmuxp load config/run_sim.yaml
 ```
 
-This VS Code task starts:
+This starts:
 
 1. Gazebo
 2. Betaflight SITL
 3. C++ bridge
 4. Websockify
 
-Then run the Python hover controller in a separate terminal:
+Inspect the running SITL configuration:
 
 ```bash
-scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
-```
-
-For detailed PID tuning and descent behavior, see `docs/usage/msp_hover_python.md`.
-
-Bridge-only stack launch:
-
-```bash
-scripts/run/run_takeoff_stack.sh --headless
-```
-
-Legacy UDP RC takeoff smoke test:
-
-```bash
-scripts/run/run_takeoff_stack.sh --udp-rc --ramp-end 1600 --hold-duration 20
-```
-
-Manual MSP hover flow:
-
-```bash
-scripts/run/run_takeoff_stack.sh
-scripts/msp_hover/hover_msp_controller.py --target-altitude 5 --duration 45 --hover-throttle 1750 --kp 120 --ki 15 --kd 60
+python3 scripts/tools/inspect_sitl_msp.py
 ```
 
 Manual launch order:
@@ -182,7 +146,6 @@ Manual launch order:
 scripts/worlds/run_quadcopter_world.sh
 scripts/run/run_betaflight_sitl.sh
 scripts/run/run_bridge.sh
-scripts/msp_hover/hover_msp_controller.py --target-altitude 5
 ```
 
 The dependency order matters:
@@ -190,7 +153,6 @@ The dependency order matters:
 1. Gazebo first, so sensor and actuator topics exist.
 2. SITL second, so UDP ports are open.
 3. Bridge third, so it can connect Gazebo and SITL.
-4. Hover controller last, so Betaflight can arm after FDM traffic exists and MSP is listening.
 
 The default motor map is:
 

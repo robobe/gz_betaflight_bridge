@@ -22,7 +22,6 @@ flowchart LR
     BR -->|FDM UDP 9003| BF[Betaflight SITL]
     BF -->|Motors UDP 9002| BR
     BR -->|Actuator topic| GZ
-    HOVER[MSP hover controller] -->|MSP TCP 5761| BF
 ```
 
 ## Slide 4: Runtime Components
@@ -32,9 +31,8 @@ flowchart LR
 - Betaflight SITL binary: `bin/betaflight_SITL.elf`
 - Bridge executable: `build/debug/betaflight_gazebo_bridge`
 - Bridge config: `config/bridge.yaml`
-- MSP hover controller: `scripts/msp_hover/hover_msp_controller.py`
 - VS Code stack task: `Stack: run all`
-- Bridge-only stack launcher: `scripts/run/run_takeoff_stack.sh`
+- SITL inspector: `scripts/tools/inspect_sitl_msp.py`
 
 ## Slide 5: Core Bridge Responsibilities
 
@@ -91,22 +89,16 @@ Important defaults:
 
 ## Slide 9: Current Verified Workflow
 
-Generate EEPROM once:
-
-```bash
-scripts/run/run_betaflight_sitl.sh --config config/betaflight/sitl_modes.cli
-```
-
 Run the whole stack:
 
 ```bash
-scripts/run/run_takeoff_stack.sh
+tmuxp load config/run_sim.yaml
 ```
 
-Run headless:
+Inspect Betaflight SITL:
 
 ```bash
-scripts/run/run_takeoff_stack.sh --headless
+python3 scripts/tools/inspect_sitl_msp.py
 ```
 
 ## Slide 10: Important Debug Finding
@@ -130,7 +122,6 @@ Without this plugin, motor commands can arrive but the vehicle will not move.
 - No motor electrical or ESC response model.
 - No GPS conversion.
 - No wind, sensor delay, packet loss, or rotor failure simulation.
-- RC takeoff helper is a smoke-test tool, not a flight mission controller.
 
 ## Slide 12: Next Improvements
 
@@ -139,5 +130,5 @@ Without this plugin, motor commands can arrive but the vehicle will not move.
 - Full pose and velocity feedback from Gazebo state.
 - Configurable sensor noise, delay, and dropout.
 - Motor-order verification tools.
-- Launch profiles for hover, takeoff, and failsafe tests.
+- Additional launch profiles when a second workflow needs them.
 - Multi-vehicle support with namespaced topics and unique UDP ports.

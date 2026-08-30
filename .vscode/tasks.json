@@ -191,22 +191,6 @@
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
-    },
-    {
-      "label": "Test: Betaflight ALT HOLD",
-      "type": "shell",
-      "command": "python3",
-      "args": [
-        "${workspaceFolder}/scripts/tests/run_althold_test.py"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      },
-      "problemMatcher": []
     }
   ]
 }

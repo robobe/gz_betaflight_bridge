@@ -270,38 +270,31 @@ Command Palette -> Tasks: Run Task -> Stack: run all
 
 ---
 
-## Usage 
-### Demo: Msp Hover control
-After the bridge is running and receiving Gazebo sensor data, run the MSP hover controller in another terminal:
+## Diagnostic tools
+
+Inspect the running Betaflight SITL build and configuration:
 
 ```bash
-scripts/msp_hover/hover_msp_controller.py \
-  --target-altitude 5 \
-  --duration 45 \
-  --hover-throttle 1750 \
-  --kp 120 \
-  --ki 15 \
-  --kd 60
+python3 scripts/tools/inspect_sitl_msp.py
 ```
 
-### Other usage
-- [Full msp hover document ](docs/usage/msp_hover_python.md)
-- [joystick msp control](docs/usage/joystick_rc_msp.md)
+Check virtual GPS data:
 
----
+```bash
+python3 scripts/tools/check_gps_msp.py
+```
 
-### Usage Menu
+See [docs/sitl_tools.md](docs/sitl_tools.md) for all retained tools.
+
+### Usage menu
 
 | Topic | Start here |
 |---|---|
-| Direct Python MSP hover, PID tuning, and descent | [docs/usage/msp_hover_python.md](docs/usage/msp_hover_python.md) |
-| MSP joystick RC control and JSON mapping | [docs/usage/joystick_rc_msp.md](docs/usage/joystick_rc_msp.md) |
 | Full documentation index | [docs/index.md](docs/index.md) |
 | Bridge architecture and runtime flow | [docs/bridge_architecture.md](docs/bridge_architecture.md) |
 | YAML config, ports, topics, and motor map | [docs/configuration.md](docs/configuration.md) |
-| Betaflight EEPROM setup for MSP RC | [docs/betaflight_sitl_eeprom.md](docs/betaflight_sitl_eeprom.md) |
+| SITL diagnostic tools | [docs/sitl_tools.md](docs/sitl_tools.md) |
 | Gazebo motor and thrust tuning | [docs/gazebo_world_motor_model.md](docs/gazebo_world_motor_model.md) |
-| MSP square mission | [docs/msp_square_mission.md](docs/msp_square_mission.md) |
 | Project summary presentation | [docs/project_summary_presentation.md](docs/project_summary_presentation.md) |
 
 ---
