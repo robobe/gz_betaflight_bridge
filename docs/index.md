@@ -15,6 +15,7 @@ Start here when navigating the project docs.
 | Motor KV and battery | [motor_kv_battery_mapping.md](motor_kv_battery_mapping.md) | Estimating rotor limits from motor and battery data |
 | Gazebo motor model | [gazebo_world_motor_model.md](gazebo_world_motor_model.md) | World structure and deep tuning of `MulticopterMotorModel` |
 | Coordinate frames | [coordinate_frames.md](coordinate_frames.md) | IMU, quaternion, and frame conversion choices |
+| GPS integration | [gps_integration.md](gps_integration.md) | Build, run, and verify virtual GPS with the bridge |
 | GPS/FDM design | [design/gps_fdm_2025_12.md](design/gps_fdm_2025_12.md) | Adding Gazebo NavSat GPS for Betaflight 2025.12.x |
 | SITL tools | [sitl_tools.md](sitl_tools.md) | Inspect Betaflight, GPS, and motor traffic |
 | Observability | [observability.md](observability.md) | Logs, topics, UDP checks, and troubleshooting signals |
@@ -26,5 +27,6 @@ Start here when navigating the project docs.
 1. [project_summary_presentation.md](project_summary_presentation.md)
 2. [requirements_design_usage.md](requirements_design_usage.md)
 3. [configuration.md](configuration.md)
-4. [sitl_tools.md](sitl_tools.md)
-5. [future_capabilities.md](future_capabilities.md)
+4. [gps_integration.md](gps_integration.md)
+5. [sitl_tools.md](sitl_tools.md)
+6. [future_capabilities.md](future_capabilities.md)
