@@ -17,6 +17,7 @@ Start here when navigating the project docs.
 | Coordinate frames | [coordinate_frames.md](coordinate_frames.md) | IMU, quaternion, and frame conversion choices |
 | GPS integration | [gps_integration.md](gps_integration.md) | Build, run, and verify virtual GPS with the bridge |
 | GPS/FDM design | [design/gps_fdm_2025_12.md](design/gps_fdm_2025_12.md) | Adding Gazebo NavSat GPS for Betaflight 2025.12.x |
+| Rangefinder design | [design/rangefinder.md](design/rangefinder.md) | Route one-beam Gazebo lidar to Betaflight TFmini or external MAVLink |
 | SITL tools | [sitl_tools.md](sitl_tools.md) | Inspect Betaflight, GPS, and motor traffic |
 | Observability | [observability.md](observability.md) | Logs, topics, UDP checks, and troubleshooting signals |
 | Future capabilities | [future_capabilities.md](future_capabilities.md) | Ideas to improve simulation realism |
