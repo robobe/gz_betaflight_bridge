@@ -1,4 +1,5 @@
 {
+  "window.title": "${rootName} [${activeRepositoryBranchName}]${separator}${activeEditorShort}",
   "cmake.configureOnOpen": true,
   "cmake.useCMakePresets": "always",
   "cmake.buildDirectory": "${workspaceFolder}/build/debug",
