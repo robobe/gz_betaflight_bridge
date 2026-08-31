@@ -4,6 +4,8 @@
 #include <set>
 #include <stdexcept>
 
+#include <arpa/inet.h>
+
 #include <yaml-cpp/yaml.h>
 
 namespace betaflight_gazebo_bridge
@@ -79,12 +81,51 @@ BridgeConfig ConfigLoader::Load(const std::filesystem::path &path)
     ReadScalar(logging, "status_period_seconds", config.logging.statusPeriodSeconds);
     ReadScalar(logging, "log_first_packets", config.logging.logFirstPackets);
 
+    const auto mavlink = root["mavlink"];
+    ReadScalar(mavlink, "address", config.mavlink.address);
+    config.mavlink.port = ReadPort(mavlink, "port", config.mavlink.port);
+    int systemId = config.mavlink.systemId;
+    int componentId = config.mavlink.componentId;
+    ReadScalar(mavlink, "system_id", systemId);
+    ReadScalar(mavlink, "component_id", componentId);
+    if (systemId < 1 || systemId > 255 || componentId < 1 || componentId > 255) {
+        throw std::runtime_error("mavlink source IDs must be in range 1..255");
+    }
+    config.mavlink.systemId = static_cast<std::uint8_t>(systemId);
+    config.mavlink.componentId = static_cast<std::uint8_t>(componentId);
+
+    const auto rangefinders = root["rangefinders"];
+    if (rangefinders && !rangefinders.IsSequence()) {
+        throw std::runtime_error("rangefinders must be a list");
+    }
+    for (const auto &node : rangefinders) {
+        RangefinderConfig rangefinder;
+        ReadScalar(node, "enable", rangefinder.enabled);
+        ReadScalar(node, "name", rangefinder.name);
+        ReadScalar(node, "gazebo_topic", rangefinder.gazeboTopic);
+        ReadScalar(node, "output", rangefinder.output);
+        ReadScalar(node, "sitl_address", rangefinder.sitlAddress);
+        rangefinder.sitlPort = ReadPort(node, "sitl_port", 0);
+        ReadScalar(node, "mavlink_message", rangefinder.mavlinkMessage);
+        ReadScalar(node, "orientation", rangefinder.orientation);
+        if (node["sensor_id"]) {
+            const int id = node["sensor_id"].as<int>();
+            if (id < 0 || id > 255) throw std::runtime_error("rangefinder sensor_id must be in range 0..255");
+            rangefinder.sensorId = static_cast<std::uint8_t>(id);
+        }
+        config.rangefinders.push_back(std::move(rangefinder));
+    }
+
     Validate(config);
     return config;
 }
 
 void ConfigLoader::Validate(const BridgeConfig &config)
 {
+    in_addr mavlinkAddress{};
+    if (inet_pton(AF_INET, config.mavlink.address.c_str(), &mavlinkAddress) != 1) {
+        throw std::runtime_error("mavlink.address must be an IPv4 address");
+    }
     if (config.gazebo.imuTopic.empty() || config.gazebo.altimeterTopic.empty() || config.gazebo.actuatorTopic.empty()) {
         throw std::runtime_error("Gazebo topics must not be empty");
     }
@@ -124,6 +165,42 @@ void ConfigLoader::Validate(const BridgeConfig &config)
         }
         if (!seen.insert(index).second) {
             throw std::runtime_error("motors.map must not contain duplicate indices");
+        }
+    }
+
+    std::set<std::string> names, topics, endpoints;
+    std::set<std::uint8_t> sensorIds;
+    bool hasObstacleDistance = false;
+    for (const auto &rangefinder : config.rangefinders) {
+        if (rangefinder.name.empty() || !names.insert(rangefinder.name).second) {
+            throw std::runtime_error("rangefinder names must be non-empty and unique");
+        }
+        if (rangefinder.gazeboTopic.empty() || !topics.insert(rangefinder.gazeboTopic).second) {
+            throw std::runtime_error("rangefinder Gazebo topics must be non-empty and unique");
+        }
+        if (rangefinder.output == "tfmini") {
+            if (rangefinder.sitlAddress.empty() || rangefinder.sitlPort == 0) {
+                throw std::runtime_error("TFmini rangefinder requires sitl_address and sitl_port");
+            }
+            if (!endpoints.insert(rangefinder.sitlAddress + ":" + std::to_string(rangefinder.sitlPort)).second) {
+                throw std::runtime_error("TFmini endpoints must be unique");
+            }
+        } else if (rangefinder.output == "mavlink") {
+            if (rangefinder.orientation != "forward") {
+                throw std::runtime_error("MAVLink rangefinder orientation must be 'forward'");
+            }
+            if (rangefinder.mavlinkMessage == "distance_sensor") {
+                if (!rangefinder.sensorId || !sensorIds.insert(*rangefinder.sensorId).second) {
+                    throw std::runtime_error("DISTANCE_SENSOR requires a unique sensor_id");
+                }
+            } else if (rangefinder.mavlinkMessage == "obstacle_distance") {
+                if (hasObstacleDistance) throw std::runtime_error("only one OBSTACLE_DISTANCE rangefinder is supported");
+                hasObstacleDistance = true;
+            } else {
+                throw std::runtime_error("mavlink_message must be 'distance_sensor' or 'obstacle_distance'");
+            }
+        } else {
+            throw std::runtime_error("rangefinder output must be 'tfmini' or 'mavlink'");
         }
     }
 }

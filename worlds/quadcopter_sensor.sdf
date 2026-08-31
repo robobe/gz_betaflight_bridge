@@ -137,7 +137,7 @@
         <iterations>true</iterations>
       </plugin>
 
-      <plugin filename="ImageDisplay" name="Front Camera">
+      <!-- <plugin filename="ImageDisplay" name="Front Camera">
         <gz-gui>
           <title>Front Camera</title>
           <property key="state" type="string">docked</property>
@@ -151,7 +151,7 @@
           <title>Down Lidar Scan</title>
           <property key="state" type="string">docked</property>
         </gz-gui>
-      </plugin>
+      </plugin> -->
 
       <plugin filename="ComponentInspector" name="Component inspector">
         <gz-gui>

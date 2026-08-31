@@ -1,0 +1,18 @@
+diff --git a/src/platform/SIMULATOR/sitl.c b/src/platform/SIMULATOR/sitl.c
+--- a/src/platform/SIMULATOR/sitl.c
++++ b/src/platform/SIMULATOR/sitl.c
+@@ -291,6 +291,14 @@ static void updateState(const fdm_packet* pkt)
+         return;
+     }
+ 
++    // The UDP worker starts before sensor initialization completes. Ignore
++    // early FDM packets instead of dereferencing the virtual sensor pointers.
++    if (!virtualAccDev || !virtualGyroDev) {
++        last_timestamp = pkt->timestamp;
++        last_realtime = realtime_now;
++        return;
++    }
++
+     const double deltaSim = pkt->timestamp - last_timestamp;  // in seconds
+     if (deltaSim < 0) { // don't use old packet
+         return;

@@ -28,6 +28,7 @@ add_library(bridge_core
   src/Config.cc
   src/GazeboTransport.cc
   src/MotorMapper.cc
+  src/Rangefinder.cc
   src/UdpSocket.cc
 )
 
@@ -36,6 +37,7 @@ target_include_directories(bridge_core
     include
     ${CMAKE_CURRENT_BINARY_DIR}/generated
 )
+target_include_directories(bridge_core SYSTEM PRIVATE external/betaflight/lib/main/MAVLink)
 target_compile_features(bridge_core PUBLIC cxx_std_20)
 target_link_libraries(bridge_core
   PUBLIC

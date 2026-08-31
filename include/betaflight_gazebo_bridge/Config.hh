@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace betaflight_gazebo_bridge
 {
@@ -50,6 +51,27 @@ struct LoggingConfig
     bool logFirstPackets{true};
 };
 
+struct MavlinkConfig
+{
+    std::string address{"127.0.0.1"};
+    std::uint16_t port{14550};
+    std::uint8_t systemId{1};
+    std::uint8_t componentId{158};
+};
+
+struct RangefinderConfig
+{
+    bool enabled{true};
+    std::string name;
+    std::string gazeboTopic;
+    std::string output;
+    std::string sitlAddress;
+    std::uint16_t sitlPort{0};
+    std::string mavlinkMessage;
+    std::string orientation;
+    std::optional<std::uint8_t> sensorId;
+};
+
 struct BridgeConfig
 {
     SitlConfig sitl;
@@ -57,6 +79,8 @@ struct BridgeConfig
     FdmConfig fdm;
     MotorConfig motors;
     LoggingConfig logging;
+    MavlinkConfig mavlink;
+    std::vector<RangefinderConfig> rangefinders;
 };
 
 class ConfigLoader

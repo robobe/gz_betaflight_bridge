@@ -8,6 +8,8 @@ SOURCE_DIR="${BETAFLIGHT_SOURCE_DIR:-${PROJECT_ROOT}/external/betaflight}"
 OUTPUT_DIR="${PROJECT_ROOT}/bin"
 OUTPUT_BINARY="${OUTPUT_DIR}/betaflight_SITL.elf"
 GPS_PATCH="${PROJECT_ROOT}/config/betaflight/virtual_gps.patch"
+SITL_SENSOR_PATCH="${PROJECT_ROOT}/config/betaflight/sitl_sensor_startup.patch"
+PATCHES=("${GPS_PATCH}" "${SITL_SENSOR_PATCH}")
 BUILD_JOBS="${BUILD_JOBS:-$(nproc)}"
 
 log() {
@@ -79,9 +81,11 @@ done
 log_info "Selected Betaflight release: ${SELECTED_TAG}"
 
 if [[ -d "${SOURCE_DIR}/.git" ]]; then
-  if git -C "${SOURCE_DIR}" apply --reverse --check "${GPS_PATCH}" 2>/dev/null; then
-    git -C "${SOURCE_DIR}" apply --reverse "${GPS_PATCH}"
-  fi
+  for patch in "${PATCHES[@]}"; do
+    if git -C "${SOURCE_DIR}" apply --reverse --check "${patch}" 2>/dev/null; then
+      git -C "${SOURCE_DIR}" apply --reverse "${patch}"
+    fi
+  done
   if [[ -n "$(git -C "${SOURCE_DIR}" status --porcelain)" ]]; then
     log_error "Refusing to update modified source tree: ${SOURCE_DIR}"
     exit 1
@@ -103,22 +107,25 @@ else
 fi
 
 git -C "${SOURCE_DIR}" submodule update --init --recursive
-if git -C "${SOURCE_DIR}" apply --check "${GPS_PATCH}" 2>/dev/null; then
-  git -C "${SOURCE_DIR}" apply "${GPS_PATCH}"
-else
-  log_info "Selected release does not need the Betaflight 2025.12 virtual GPS patch."
-fi
+for patch in "${PATCHES[@]}"; do
+  if git -C "${SOURCE_DIR}" apply --check "${patch}" 2>/dev/null; then
+    git -C "${SOURCE_DIR}" apply "${patch}"
+  else
+    log_info "Patch $(basename "${patch}") is already present or not needed by this release."
+  fi
+done
 
 # Betaflight validates its pinned ARM toolchain before selecting the native
 # compiler used by SITL. This target is idempotent after the first installation.
 log_info "Ensuring Betaflight's pinned build toolchain is installed."
 make -C "${SOURCE_DIR}" arm_sdk_install
 
-log_info "Building Betaflight ${SELECTED_TAG} for SITL with GPS and ${BUILD_JOBS} jobs."
+EXTRA_FLAGS="-DUSE_RANGEFINDER_TF"
+log_info "Building Betaflight ${SELECTED_TAG} for SITL with GPS, TFmini rangefinder, and ${BUILD_JOBS} jobs."
 if grep -qx '#define USE_GPS' "${SOURCE_DIR}/src/platform/SIMULATOR/target/SITL/target.h"; then
-  make -C "${SOURCE_DIR}" TARGET=SITL -j"${BUILD_JOBS}"
+  make -C "${SOURCE_DIR}" TARGET=SITL EXTRA_FLAGS="${EXTRA_FLAGS}" -j"${BUILD_JOBS}"
 else
-  make -C "${SOURCE_DIR}" TARGET=SITL EXTRA_FLAGS=-DUSE_GPS -j"${BUILD_JOBS}"
+  make -C "${SOURCE_DIR}" TARGET=SITL EXTRA_FLAGS="${EXTRA_FLAGS} -DUSE_GPS" -j"${BUILD_JOBS}"
 fi
 
 BUILT_BINARY="${SOURCE_DIR}/obj/main/betaflight_SITL.elf"

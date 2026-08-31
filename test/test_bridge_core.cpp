@@ -6,6 +6,7 @@
 #include "betaflight_gazebo_bridge/GazeboTransport.hh"
 #include "betaflight_gazebo_bridge/MotorMapper.hh"
 #include "betaflight_gazebo_bridge/Packets.hh"
+#include "betaflight_gazebo_bridge/Rangefinder.hh"
 
 using namespace betaflight_gazebo_bridge;
 
@@ -16,6 +17,16 @@ int main()
     static_assert(sizeof(RcPacket) == 40);
 
     ConfigLoader::Validate(BridgeConfig{});
+    assert(RangefinderConfig{}.enabled);
+
+    const auto tfmini = EncodeTfmini(1.23);
+    assert(tfmini[0] == 0x59 && tfmini[1] == 0x59);
+    assert(tfmini[2] == 123 && tfmini[3] == 0);
+    unsigned checksum = 0;
+    for (std::size_t i = 0; i < 8; ++i) checksum += tfmini[i];
+    assert(tfmini[8] == (checksum & 0xff));
+    const auto invalidTfmini = EncodeTfmini(std::nan(""));
+    assert(invalidTfmini[2] == (1201 & 0xff) && invalidTfmini[3] == (1201 >> 8));
 
     BridgeConfig duplicateMap;
     duplicateMap.motors.map = {0, 0, 2, 3};

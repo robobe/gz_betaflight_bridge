@@ -33,7 +33,8 @@ BridgeApp::BridgeApp(BridgeConfig config)
       fdmBuilder_(config_.fdm),
       motorMapper_(config_.motors.map),
       velocityConverter_(config_.motors.minRotorVelocityRadS, config_.motors.maxRotorVelocityRadS),
-      startTime_(std::chrono::steady_clock::now())
+      startTime_(std::chrono::steady_clock::now()),
+      rangefinders_(config_.rangefinders, config_.mavlink, startTime_)
 {
     motorSocket_.Bind(config_.sitl.motorPort);
     fdmSocket_.SetDestination(config_.sitl.address, config_.sitl.fdmPort);
@@ -52,6 +53,7 @@ int BridgeApp::Run()
         ReceiveMotorPackets();
         PublishMotorCommandIfNeeded();
         SendFdmIfNeeded();
+        rangefinders_.Update();
         LogStatusIfNeeded();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -161,6 +163,7 @@ void BridgeApp::LogStatusIfNeeded()
     spdlog::info("status imu={} altimeter={} navsat={} fdm_packets={} motor_packets={} malformed_motor_packets={}",
                  stateSubscriber_.HasImu(), stateSubscriber_.HasAltimeter(), navsatStatus,
                  fdmPackets_, motorPackets_, malformedMotorPackets_);
+    rangefinders_.LogStatus();
 }
 
 std::array<double, 4> BridgeApp::ZeroMotors() const

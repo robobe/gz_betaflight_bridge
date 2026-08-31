@@ -25,6 +25,28 @@ motors:
   timeout_seconds: 0.10
   publish_zero_on_timeout: true
 
+mavlink:
+  address: 127.0.0.1
+  port: 14550
+  system_id: 1
+  component_id: 158
+
+rangefinders:
+  - name: down
+    enable: true
+    gazebo_topic: /X3/down_range/scan
+    output: tfmini
+    sitl_address: 127.0.0.1
+    sitl_port: 5762
+
+  - name: front
+    enable: true
+    gazebo_topic: /X3/front_range/scan
+    output: mavlink
+    mavlink_message: distance_sensor
+    orientation: forward
+    sensor_id: 0
+
 logging:
   level: info
   status_period_seconds: 1.0

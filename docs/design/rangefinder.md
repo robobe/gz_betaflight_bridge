@@ -217,7 +217,7 @@ The heartbeat follows the official
 ```text
 feature RANGEFINDER
 serial UART2 32768 115200 115200 0 115200
-set rangefinder_hardware = TFMINI
+set rangefinder_hardware=TFMINI
 save
 ```
 

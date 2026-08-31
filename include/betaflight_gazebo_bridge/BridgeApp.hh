@@ -6,6 +6,7 @@
 #include "betaflight_gazebo_bridge/Config.hh"
 #include "betaflight_gazebo_bridge/GazeboTransport.hh"
 #include "betaflight_gazebo_bridge/MotorMapper.hh"
+#include "betaflight_gazebo_bridge/Rangefinder.hh"
 #include "betaflight_gazebo_bridge/UdpSocket.hh"
 
 namespace betaflight_gazebo_bridge
@@ -38,6 +39,7 @@ private:
     std::chrono::steady_clock::time_point lastFdmSendTime_{};
     std::chrono::steady_clock::time_point lastStatusLogTime_{};
     std::chrono::steady_clock::time_point startTime_;
+    RangefinderManager rangefinders_;
 
     bool hasMotorPacket_{false};
     bool motorTimedOut_{false};
@@ -49,4 +51,3 @@ private:
 };
 
 }  // namespace betaflight_gazebo_bridge
-

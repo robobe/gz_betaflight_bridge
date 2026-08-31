@@ -7,7 +7,7 @@ windows:
     panes:
       - shell_command:
           - printf '\033]2;%s\033\\' 'gazebo'
-          - ./scripts/worlds/run_quadcopter_world.sh -r
+          - ./scripts/worlds/run_quadcopter_sensor_world.sh -r -s
       - shell_command:
           - printf '\033]2;%s\033\\' 'websockify'
           - uv run websockify 127.0.0.1:6761 127.0.0.1:5761

@@ -22,7 +22,7 @@ FEATURES = {
 }
 SENSORS = ("ACC", "BARO", "MAG", "GPS", "RANGEFINDER", "GYRO", "OPTICALFLOW")
 GPS_PROVIDERS = ("NMEA", "UBLOX", "MSP", "VIRTUAL", "DRONECAN")
-SERIAL_FUNCTIONS = {0: "MSP", 1: "GPS", 6: "RX_SERIAL", 7: "BLACKBOX", 9: "MAVLINK"}
+SERIAL_FUNCTIONS = {0: "MSP", 1: "GPS", 6: "RX_SERIAL", 7: "BLACKBOX", 9: "MAVLINK", 15: "LIDAR_TF"}
 
 
 def pstring(data: bytes, offset: int) -> tuple[str, int]:

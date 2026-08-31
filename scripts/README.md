@@ -17,4 +17,5 @@ scripts/worlds/run_quadcopter_world.sh -r
 scripts/run/run_betaflight_sitl.sh
 scripts/run/run_bridge.sh config/bridge.yaml
 python3 scripts/tools/inspect_sitl_msp.py
+python3 scripts/tools/configure_rangefinder_cli.py
 ```
