@@ -13,5 +13,12 @@
     "${workspaceFolder}/src",
     "/usr/local/include",
     "/usr/include"
-  ]
+  ],
+  "terminal.integrated.profiles.linux": {
+    "Project Bash": {
+      "path": "/bin/bash",
+      "args": ["--rcfile", "${workspaceFolder}/env.sh"]
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "Project Bash"
 }
