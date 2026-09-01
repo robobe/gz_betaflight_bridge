@@ -31,6 +31,10 @@ mavlink:
   system_id: 1
   component_id: 158
 
+odometry:
+  enable: true
+  gazebo_topic: /model/X3/odometry
+
 rangefinders:
   - name: down
     enable: true

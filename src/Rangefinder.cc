@@ -203,14 +203,6 @@ struct RangefinderManager::Impl
     void Update()
     {
         const auto now = Clock::now();
-        if (now - lastHeartbeat >= std::chrono::seconds(1) &&
-            std::any_of(mappings.begin(), mappings.end(), [](const auto &m) { return m->config.output == "mavlink"; })) {
-            mavlink_message_t heartbeat{};
-            mavlink_msg_heartbeat_pack(mavlink.systemId, mavlink.componentId, &heartbeat,
-                MAV_TYPE_ONBOARD_CONTROLLER, MAV_AUTOPILOT_INVALID, 0, 0, MAV_STATE_ACTIVE);
-            SendMavlink(udp, heartbeat);
-            lastHeartbeat = now;
-        }
         for (auto &mapping : mappings) {
             if (mapping->config.output == "tfmini") UpdateTfmini(*mapping, now);
         }
@@ -218,7 +210,6 @@ struct RangefinderManager::Impl
 
     MavlinkConfig mavlink;
     Clock::time_point start;
-    Clock::time_point lastHeartbeat{};
     UdpSocket udp;
     gz::transport::Node node;
     std::vector<std::unique_ptr<Mapping>> mappings;

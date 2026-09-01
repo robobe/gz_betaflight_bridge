@@ -1,11 +1,16 @@
 #include "betaflight_gazebo_bridge/BridgeApp.hh"
 
 #include <atomic>
+#include <algorithm>
 #include <csignal>
 #include <cstring>
 #include <thread>
 
 #include <spdlog/spdlog.h>
+
+extern "C" {
+#include <common/mavlink.h>
+}
 
 namespace betaflight_gazebo_bridge
 {
@@ -34,10 +39,14 @@ BridgeApp::BridgeApp(BridgeConfig config)
       motorMapper_(config_.motors.map),
       velocityConverter_(config_.motors.minRotorVelocityRadS, config_.motors.maxRotorVelocityRadS),
       startTime_(std::chrono::steady_clock::now()),
-      rangefinders_(config_.rangefinders, config_.mavlink, startTime_)
+      rangefinders_(config_.rangefinders, config_.mavlink, startTime_),
+      odometry_(config_.odometry, config_.mavlink)
 {
     motorSocket_.Bind(config_.sitl.motorPort);
     fdmSocket_.SetDestination(config_.sitl.address, config_.sitl.fdmPort);
+    hasMavlinkOutput_ = config_.odometry.enabled || std::any_of(config_.rangefinders.begin(), config_.rangefinders.end(),
+        [](const auto &rangefinder) { return rangefinder.enabled && rangefinder.output == "mavlink"; });
+    if (hasMavlinkOutput_) mavlinkSocket_.SetDestination(config_.mavlink.address, config_.mavlink.port);
     spdlog::info("Listening for Betaflight motors on UDP {}", config_.sitl.motorPort);
     spdlog::info("Sending FDM to {}:{}", config_.sitl.address, config_.sitl.fdmPort);
 }
@@ -54,6 +63,8 @@ int BridgeApp::Run()
         PublishMotorCommandIfNeeded();
         SendFdmIfNeeded();
         rangefinders_.Update();
+        odometry_.Update();
+        SendMavlinkHeartbeatIfNeeded();
         LogStatusIfNeeded();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -61,6 +72,19 @@ int BridgeApp::Run()
     actuatorPublisher_.Publish(ZeroMotors());
     spdlog::info("Bridge stopped; published zero motor command");
     return 0;
+}
+
+void BridgeApp::SendMavlinkHeartbeatIfNeeded()
+{
+    const auto now = std::chrono::steady_clock::now();
+    if (!hasMavlinkOutput_ || now - lastMavlinkHeartbeatTime_ < std::chrono::seconds(1)) return;
+    mavlink_message_t heartbeat{};
+    mavlink_msg_heartbeat_pack(config_.mavlink.systemId, config_.mavlink.componentId, &heartbeat,
+        MAV_TYPE_ONBOARD_CONTROLLER, MAV_AUTOPILOT_INVALID, 0, 0, MAV_STATE_ACTIVE);
+    std::array<std::uint8_t, MAVLINK_MAX_PACKET_LEN> buffer{};
+    const auto size = mavlink_msg_to_send_buffer(buffer.data(), &heartbeat);
+    mavlinkSocket_.Send(buffer.data(), size);
+    lastMavlinkHeartbeatTime_ = now;
 }
 
 void BridgeApp::ReceiveMotorPackets()
@@ -164,6 +188,7 @@ void BridgeApp::LogStatusIfNeeded()
                  stateSubscriber_.HasImu(), stateSubscriber_.HasAltimeter(), navsatStatus,
                  fdmPackets_, motorPackets_, malformedMotorPackets_);
     rangefinders_.LogStatus();
+    odometry_.LogStatus();
 }
 
 std::array<double, 4> BridgeApp::ZeroMotors() const

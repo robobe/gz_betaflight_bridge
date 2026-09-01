@@ -6,6 +6,7 @@
 #include "betaflight_gazebo_bridge/Config.hh"
 #include "betaflight_gazebo_bridge/GazeboTransport.hh"
 #include "betaflight_gazebo_bridge/MotorMapper.hh"
+#include "betaflight_gazebo_bridge/Odometry.hh"
 #include "betaflight_gazebo_bridge/Rangefinder.hh"
 #include "betaflight_gazebo_bridge/UdpSocket.hh"
 
@@ -22,12 +23,14 @@ private:
     void ReceiveMotorPackets();
     void PublishMotorCommandIfNeeded();
     void SendFdmIfNeeded();
+    void SendMavlinkHeartbeatIfNeeded();
     void LogStatusIfNeeded();
     std::array<double, 4> ZeroMotors() const;
 
     BridgeConfig config_;
     UdpSocket motorSocket_;
     UdpSocket fdmSocket_;
+    UdpSocket mavlinkSocket_;
     GazeboStateSubscriber stateSubscriber_;
     ActuatorPublisher actuatorPublisher_;
     FdmBuilder fdmBuilder_;
@@ -40,6 +43,9 @@ private:
     std::chrono::steady_clock::time_point lastStatusLogTime_{};
     std::chrono::steady_clock::time_point startTime_;
     RangefinderManager rangefinders_;
+    OdometryManager odometry_;
+    std::chrono::steady_clock::time_point lastMavlinkHeartbeatTime_{};
+    bool hasMavlinkOutput_{};
 
     bool hasMotorPacket_{false};
     bool motorTimedOut_{false};

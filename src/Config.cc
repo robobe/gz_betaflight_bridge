@@ -94,6 +94,10 @@ BridgeConfig ConfigLoader::Load(const std::filesystem::path &path)
     config.mavlink.systemId = static_cast<std::uint8_t>(systemId);
     config.mavlink.componentId = static_cast<std::uint8_t>(componentId);
 
+    const auto odometry = root["odometry"];
+    ReadScalar(odometry, "enable", config.odometry.enabled);
+    ReadScalar(odometry, "gazebo_topic", config.odometry.gazeboTopic);
+
     const auto rangefinders = root["rangefinders"];
     if (rangefinders && !rangefinders.IsSequence()) {
         throw std::runtime_error("rangefinders must be a list");
@@ -131,6 +135,9 @@ void ConfigLoader::Validate(const BridgeConfig &config)
     }
     if (config.gazebo.navsatTopic && config.gazebo.navsatTopic->empty()) {
         throw std::runtime_error("gazebo.navsat_topic must not be empty");
+    }
+    if (config.odometry.enabled && config.odometry.gazeboTopic.empty()) {
+        throw std::runtime_error("odometry.gazebo_topic must not be empty");
     }
     if (config.fdm.rateHz <= 0.0) {
         throw std::runtime_error("fdm.rate_hz must be positive");

@@ -59,18 +59,13 @@ zero is appropriate for initial ground-truth testing.
 Select the MAVLink representation in `config/bridge.yaml`:
 
 ```yaml
-pose:
+odometry:
   enable: true
   gazebo_topic: /model/X3/odometry
-  mavlink_message: odometry  # odometry or vision
 ```
 
-`odometry` publishes one `ODOMETRY` message per Gazebo sample. `vision`
-publishes one `VISION_POSITION_ESTIMATE` and one `VISION_SPEED_ESTIMATE` with
-the same sample timestamp. An absent block or `enable: false` disables the
-subscription and adds no traffic. Reject any other `mavlink_message` value at
-startup; do not support configuring only half of the vision pair because the
-stated interface is relative pose and velocity.
+The bridge publishes one `ODOMETRY` message per Gazebo sample. An absent block
+or `enable: false` disables the subscription and adds no odometry traffic.
 
 ## MAVLink `ODOMETRY` contract
 
@@ -139,18 +134,6 @@ less truthful than publishing odometry. Add it only when testing an autopilot
 that actually fuses `OPTICAL_FLOW_RAD`, ideally from a Gazebo optical-flow
 sensor model rather than pose differencing.
 
-### `VISION_POSITION_ESTIMATE` (102) and `VISION_SPEED_ESTIMATE` (103)
-
-`VISION_POSITION_ESTIMATE` carries local `x,y,z` in metres and
-`roll,pitch,yaw` in radians, plus a 21-element upper-triangle pose covariance
-and reset counter. `VISION_SPEED_ESTIMATE` separately carries global `x,y,z`
-speed in m/s, a full 3x3 velocity covariance, and reset counter. Both use
-microsecond epoch-or-boot timestamps. They require two messages, do not carry
-explicit frame IDs, and lose angular velocity, so `ODOMETRY` is clearer and
-smaller as a design surface. The configured `vision` compatibility mode sends
-both from the same Gazebo sample and uses the same local-NED convention as the
-canonical `ODOMETRY` output.
-
 ### `LOCAL_POSITION_NED` (32)
 
 This message carries only filtered NED `x,y,z` (m) and `vx,vy,vz` (m/s) with
@@ -202,9 +185,12 @@ Therefore:
 - Verify one stationary sample, +X/+Y/+Z translation, yaw rotation, and reset.
   Decode the generated packet and assert frame IDs, signs, units, timestamp,
   covariance sentinel, reset counter, and MAVLink 2 framing.
-- Run that check once with `mavlink_message: odometry` and once with
-  `mavlink_message: vision`; the vision check must receive both message IDs
-  with identical timestamps.
+
+With Gazebo and the bridge running, inspect the live output with:
+
+```bash
+scripts/tools/check_mavlink_odometry.py
+```
 
 ## Deferred work
 

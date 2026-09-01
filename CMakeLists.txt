@@ -28,6 +28,7 @@ add_library(bridge_core
   src/Config.cc
   src/GazeboTransport.cc
   src/MotorMapper.cc
+  src/Odometry.cc
   src/Rangefinder.cc
   src/UdpSocket.cc
 )

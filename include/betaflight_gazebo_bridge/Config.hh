@@ -59,6 +59,12 @@ struct MavlinkConfig
     std::uint8_t componentId{158};
 };
 
+struct OdometryConfig
+{
+    bool enabled{false};
+    std::string gazeboTopic{"/model/X3/odometry"};
+};
+
 struct RangefinderConfig
 {
     bool enabled{true};
@@ -80,6 +86,7 @@ struct BridgeConfig
     MotorConfig motors;
     LoggingConfig logging;
     MavlinkConfig mavlink;
+    OdometryConfig odometry;
     std::vector<RangefinderConfig> rangefinders;
 };
 

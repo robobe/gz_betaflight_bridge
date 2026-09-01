@@ -5,6 +5,7 @@
 #include "betaflight_gazebo_bridge/Config.hh"
 #include "betaflight_gazebo_bridge/GazeboTransport.hh"
 #include "betaflight_gazebo_bridge/MotorMapper.hh"
+#include "betaflight_gazebo_bridge/Odometry.hh"
 #include "betaflight_gazebo_bridge/Packets.hh"
 #include "betaflight_gazebo_bridge/Rangefinder.hh"
 
@@ -18,6 +19,28 @@ int main()
 
     ConfigLoader::Validate(BridgeConfig{});
     assert(RangefinderConfig{}.enabled);
+
+    OdometryConverter odometryConverter;
+    OdometrySample odometrySample;
+    odometrySample.timeUsec = 200;
+    odometrySample.position = {10.0, 20.0, 30.0};
+    odometrySample.linearVelocity = {1.0, 2.0, 3.0};
+    odometrySample.angularVelocity = {4.0, 5.0, 6.0};
+    const auto firstOdometry = odometryConverter.Convert(odometrySample);
+    assert(firstOdometry);
+    assert((firstOdometry->position == std::array<float, 3>{0.0F, 0.0F, 0.0F}));
+    assert((firstOdometry->linearVelocity == std::array<float, 3>{1.0F, -2.0F, -3.0F}));
+    assert((firstOdometry->angularVelocity == std::array<float, 3>{4.0F, -5.0F, -6.0F}));
+    odometrySample.timeUsec = 300;
+    odometrySample.position = {11.0, 22.0, 27.0};
+    const auto movedOdometry = odometryConverter.Convert(odometrySample);
+    assert((movedOdometry->position == std::array<float, 3>{2.0F, 1.0F, 3.0F}));
+    odometrySample.timeUsec = 100;
+    const auto resetOdometry = odometryConverter.Convert(odometrySample);
+    assert((resetOdometry->position == std::array<float, 3>{0.0F, 0.0F, 0.0F}));
+    assert(resetOdometry->resetCounter == 1);
+    odometrySample.orientation = {};
+    assert(!odometryConverter.Convert(odometrySample));
 
     const auto tfmini = EncodeTfmini(1.23);
     assert(tfmini[0] == 0x59 && tfmini[1] == 0x59);

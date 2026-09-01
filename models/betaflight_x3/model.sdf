@@ -336,5 +336,12 @@
                 <use_parent_model_frame>1</use_parent_model_frame>
             </axis>
         </joint>
+        <plugin filename="gz-sim-odometry-publisher-system"
+                name="gz::sim::systems::OdometryPublisher">
+            <dimensions>3</dimensions>
+            <odom_publish_frequency>50</odom_publish_frequency>
+            <odom_topic>/model/X3/odometry</odom_topic>
+            <gaussian_noise>0</gaussian_noise>
+        </plugin>
     </model>
 </sdf>
