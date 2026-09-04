@@ -65,3 +65,4 @@ __pycache__/
 
 # Local third-party source checkouts
 external/
+camera.mp4

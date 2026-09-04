@@ -63,6 +63,50 @@ gst-launch-1.0 -v \
 
 Change `/camera` if your Gazebo image topic is different.
 
+## Python OpenCV Viewer
+
+Use a Python environment whose OpenCV build includes GStreamer and GUI support:
+
+```sh
+python -c 'import cv2; print(cv2.getBuildInformation())' | grep GStreamer
+```
+
+With Gazebo publishing the front camera, run from this directory:
+
+```sh
+../../scripts/tools/view_camera.py
+```
+
+The viewer finds the plugin in `build/` automatically and opens this low-latency
+pipeline:
+
+```text
+gzimgsrc ! videoconvert ! video/x-raw,format=BGR ! appsink
+```
+
+It defaults to `/X3/front_camera/image`. Select another topic or plugin build:
+
+```sh
+../../scripts/tools/view_camera.py --topic /camera --plugin-path /path/to/gst_gzimgsrc/build
+```
+
+The camera and recording controls share one window. Press `q` or Escape, close
+the window, or press Ctrl-C to exit. The displayed FPS is calculated over the
+latest second. Enter a full output path or select the directory and filename
+with Browse.
+
+Record clean frames without the FPS overlay using OpenCV `VideoWriter`:
+
+```sh
+../../scripts/tools/view_camera.py
+```
+
+Use Start Recording and Stop Recording to control capture. Recording uses MP4V,
+writes clean frames at 30 FPS without the FPS overlay, and overwrites an
+existing output file. The active Gazebo topic is used as the window title.
+The Help button explains how to install OpenCV with GStreamer support and how
+to trim recordings with FFmpeg.
+
 For caps negotiation and plugin debugging:
 
 ```sh
